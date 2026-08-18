@@ -471,10 +471,8 @@
             debugLog.appendChild(entry);
             debugLog.scrollTop = debugLog.scrollHeight;
             
-            // Also log to console
             console.log(`[DEBUG] ${message}`, data || '');
             
-            // Update status bar with debug info
             const statusMsg = document.getElementById('statusMsg');
             if (type === 'error') {
                 statusMsg.textContent = `❌ ${message}`;
@@ -640,10 +638,11 @@
             }
         }
 
-        // ======================== COLLECT FROM DOM ========================
+        // ======================== FIXED: COLLECT FROM DOM ========================
         function collectFromDOM() {
             logDebug('📊 Collecting data from DOM...', 'info');
             
+            // --- BIO DATA ---
             const bioInputs = document.querySelectorAll('#bioDataContainer input');
             bioInputs.forEach(inp => {
                 const key = inp.dataset.key;
@@ -657,29 +656,41 @@
                 }
             });
 
+            // --- SUBJECTS DATA (FIXED) ---
             const rows = document.querySelectorAll('#scoresBody tr');
             rows.forEach((tr, idx) => {
-                const inputs = tr.querySelectorAll('input');
-                if (inputs.length === 15 && currentData.subjects[idx]) {
+                if (currentData.subjects[idx]) {
                     const subj = currentData.subjects[idx];
-                    subj.name = tr.querySelector('td:first-child')?.textContent || '';
-                    subj.test1 = inputs[1].value;
-                    subj.test2 = inputs[2].value;
-                    subj.test3 = inputs[3].value;
-                    subj.ass1 = inputs[4].value;
-                    subj.ass2 = inputs[5].value;
-                    subj.ass3 = inputs[6].value;
-                    subj.casum = inputs[7].value;
-                    subj.exam = inputs[8].value;
-                    subj.total = inputs[9].value;
-                    subj.cummBf = inputs[10].value;
-                    subj.cummScore = inputs[11].value;
-                    subj.avg = inputs[12].value;
-                    subj.pos = inputs[13].value;
-                    subj.grade = inputs[14].value;
+                    const inputs = tr.querySelectorAll('input');
+                    
+                    // Subject name (from the text node in first td)
+                    const subjectName = tr.querySelector('td:first-child')?.textContent || '';
+                    subj.name = subjectName;
+                    
+                    // Map each input to its corresponding field
+                    // Index mapping: 0=subject(not input), 1=test1, 2=test2, 3=test3, 
+                    // 4=ass1, 5=ass2, 6=ass3, 7=casum, 8=exam, 9=total, 
+                    // 10=cummBf, 11=cummScore, 12=avg, 13=pos, 14=grade
+                    if (inputs.length >= 15) {
+                        subj.test1 = inputs[1]?.value || '0';
+                        subj.test2 = inputs[2]?.value || '0';
+                        subj.test3 = inputs[3]?.value || '0';
+                        subj.ass1 = inputs[4]?.value || '0';
+                        subj.ass2 = inputs[5]?.value || '0';
+                        subj.ass3 = inputs[6]?.value || '0';
+                        subj.casum = inputs[7]?.value || '0';
+                        subj.exam = inputs[8]?.value || '0';
+                        subj.total = inputs[9]?.value || '0';
+                        subj.cummBf = inputs[10]?.value || '0';
+                        subj.cummScore = inputs[11]?.value || '0';
+                        subj.avg = inputs[12]?.value || '0';
+                        subj.pos = inputs[13]?.value || '-';
+                        subj.grade = inputs[14]?.value || '-';
+                    }
                 }
             });
 
+            // --- CHARACTER DEVELOPMENT ---
             const charRows = document.querySelectorAll('#characterTable tr:not(:first-child)');
             charRows.forEach((tr, idx) => {
                 const inputs = tr.querySelectorAll('input');
@@ -689,6 +700,7 @@
                 }
             });
 
+            // --- PRACTICAL SKILLS ---
             const pracRows = document.querySelectorAll('#practicalTable tr:not(:first-child)');
             pracRows.forEach((tr, idx) => {
                 const inputs = tr.querySelectorAll('input');
@@ -698,6 +710,7 @@
                 }
             });
 
+            // --- REMARKS ---
             const remarkRows = document.querySelectorAll('#remarksBody tr');
             remarkRows.forEach((tr, idx) => {
                 const inputs = tr.querySelectorAll('input');
@@ -707,7 +720,11 @@
                 }
             });
             
-            logDebug('✅ DOM data collected successfully', 'success', { student: currentData.student.name });
+            logDebug('✅ DOM data collected successfully', 'success', { 
+                student: currentData.student.name,
+                subjects: currentData.subjects.length,
+                remarks: currentData.remarks.length
+            });
         }
 
         // ======================== RENDER ========================
@@ -755,6 +772,7 @@
                     const inp = document.createElement('input');
                     inp.type = 'text';
                     inp.value = val !== undefined && val !== null ? val : '';
+                    // Make calculated fields readonly (indices 6, 8, 10, 11, 13)
                     if (i === 6 || i === 8 || i === 10 || i === 11 || i === 13) {
                         inp.readOnly = true;
                         inp.style.fontWeight = '600';
@@ -875,10 +893,8 @@
         // ======================== LOGOUT FUNCTION ========================
         function logout() {
             logDebug('🚪 Logging out...', 'info');
-            // Clear any session data
             localStorage.removeItem('wisdom_auth_user');
             localStorage.removeItem('wisdom_current_student_id');
-            // Redirect to index.html
             window.location.href = 'index.html';
         }
 
