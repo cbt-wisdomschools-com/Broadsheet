@@ -109,6 +109,13 @@
             border: 1px solid #c8e6c9;
         }
 
+        .message.info {
+            display: block;
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #bbdefb;
+        }
+
         .links {
             text-align: center;
             margin-top: 20px;
@@ -178,26 +185,11 @@
         .debug-log .timestamp {
             color: #858585;
         }
-
-        .debug-log .info {
-            color: #4fc3f7;
-        }
-
-        .debug-log .success {
-            color: #81c784;
-        }
-
-        .debug-log .error {
-            color: #ef5350;
-        }
-
-        .debug-log .warning {
-            color: #ffd54f;
-        }
-
-        .debug-log .data {
-            color: #ce93d8;
-        }
+        .debug-log .info { color: #4fc3f7; }
+        .debug-log .success { color: #81c784; }
+        .debug-log .error { color: #ef5350; }
+        .debug-log .warning { color: #ffd54f; }
+        .debug-log .data { color: #ce93d8; }
     </style>
 </head>
 <body>
@@ -227,7 +219,7 @@
         <div id="message" class="message"></div>
 
         <div class="links">
-            Already have an account? <a href="login.html">Login here</a>
+            Already have an account? <a href="login_firebase.html">Login here</a>
         </div>
 
         <div class="debug-container">
@@ -238,29 +230,25 @@
 
     <script type="module">
         // ==================== FIREBASE IMPORTS ====================
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
         import { 
             getAuth, 
             createUserWithEmailAndPassword,
             sendEmailVerification
-        } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+        } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
         import { 
             getFirestore, 
             doc, 
             setDoc, 
             serverTimestamp 
-        } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+        } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
         // ==================== DEBUG LOGGER ====================
         const debugLog = document.getElementById('debugLog');
         const debugToggle = document.getElementById('debugToggle');
-        let debugEntries = [];
 
         function logDebug(message, type = 'info', data = null) {
             const timestamp = new Date().toISOString();
-            const entry = { timestamp, message, type, data };
-            debugEntries.push(entry);
-            
             const logEntry = document.createElement('div');
             logEntry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="${type}">${message}</span>${data ? `\n<span class="data">📦 ${JSON.stringify(data, null, 2)}</span>` : ''}`;
             debugLog.appendChild(logEntry);
@@ -287,10 +275,12 @@
         // ==================== INITIALIZE FIREBASE ====================
         logDebug('🚀 Initializing Firebase with Auth + Firestore...', 'info');
 
+        let auth, db;
+
         try {
             const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            const db = getFirestore(app);
+            auth = getAuth(app);
+            db = getFirestore(app);
             
             logDebug('✅ Firebase initialized successfully!', 'success');
             logDebug(`📁 Project: ${firebaseConfig.projectId}`, 'info');
@@ -313,8 +303,6 @@
         const registerBtn = document.getElementById('registerBtn');
         const messageDiv = document.getElementById('message');
 
-        logDebug('📋 DOM elements loaded', 'info');
-
         function showMessage(text, type = 'error') {
             messageDiv.textContent = text;
             messageDiv.className = `message ${type}`;
@@ -333,7 +321,7 @@
 
             logDebug(`📊 Data: Name="${name}", Email="${email}"`, 'info');
 
-            // ==================== VALIDATIONS ====================
+            // Validations
             if (!name || !email || !password || !confirmPassword) {
                 showMessage('Please fill in all fields', 'error');
                 return;
@@ -354,30 +342,27 @@
             messageDiv.className = 'message';
 
             try {
-                const auth = window.auth;
-                const db = window.db;
-
-                if (!auth || !db) {
-                    throw new Error('Firebase not initialized');
+                if (!auth) {
+                    throw new Error('Firebase Auth not initialized. Please refresh the page.');
                 }
 
-                // ==================== CREATE USER WITH FIREBASE AUTH ====================
+                // ==================== CREATE USER ====================
                 logDebug('🔐 Creating user with Firebase Auth...', 'info');
                 
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
-                logDebug(`✅ User created successfully! UID: ${user.uid}`, 'success', { uid: user.uid, email: user.email });
+                logDebug(`✅ User created! UID: ${user.uid}`, 'success');
 
-                // ==================== SEND EMAIL VERIFICATION ====================
+                // ==================== SEND VERIFICATION ====================
                 try {
                     await sendEmailVerification(user);
                     logDebug('📧 Verification email sent', 'success');
                 } catch (error) {
-                    logDebug(`⚠️ Could not send verification email: ${error.message}`, 'warning');
+                    logDebug(`⚠️ Could not send verification: ${error.message}`, 'warning');
                 }
 
-                // ==================== SAVE USER DATA TO FIRESTORE ====================
+                // ==================== SAVE TO FIRESTORE ====================
                 logDebug('💾 Saving user data to Firestore...', 'info');
                 
                 const userData = {
@@ -390,44 +375,44 @@
                 };
 
                 await setDoc(doc(db, 'users', user.uid), userData);
-                logDebug('✅ User data saved to Firestore', 'success', userData);
+                logDebug('✅ User data saved', 'success');
 
-                // ==================== SUCCESS ====================
-                showMessage('✅ Account created successfully! Redirecting to login...', 'success');
-                logDebug('🎉 Registration completed successfully!', 'success');
+                showMessage('✅ Account created! Redirecting to login...', 'success');
 
                 setTimeout(() => {
                     window.location.href = 'login.html';
                 }, 2000);
 
             } catch (error) {
-                // ==================== ERROR HANDLING ====================
-                logDebug(`❌ Registration error: ${error.message}`, 'error', error);
+                logDebug(`❌ Error: ${error.message}`, 'error', error);
                 
-                // Common Firebase Auth errors
-                let errorMessage = 'An error occurred. Please try again.';
-                
-                switch (error.code) {
-                    case 'auth/email-already-in-use':
-                        errorMessage = '❌ This email is already registered. Please login.';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = '❌ Invalid email address.';
-                        break;
-                    case 'auth/weak-password':
-                        errorMessage = '❌ Password is too weak. Use at least 6 characters.';
-                        break;
-                    case 'auth/too-many-requests':
-                        errorMessage = '❌ Too many attempts. Please try again later.';
-                        break;
-                    case 'auth/network-request-failed':
-                        errorMessage = '❌ Network error. Check your internet connection.';
-                        break;
-                    default:
-                        errorMessage = `❌ ${error.message}`;
+                // Check if it's the configuration error
+                if (error.code === 'auth/configuration-not-found') {
+                    showMessage('❌ Authentication not enabled in Firebase Console. Please enable Email/Password authentication.', 'error');
+                    logDebug('🔴 IMPORTANT: Go to Firebase Console → Authentication → Sign-in methods → Enable Email/Password', 'error');
+                } else {
+                    let errorMessage = 'An error occurred. Please try again.';
+                    switch (error.code) {
+                        case 'auth/email-already-in-use':
+                            errorMessage = '❌ This email is already registered. Please login.';
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage = '❌ Invalid email address.';
+                            break;
+                        case 'auth/weak-password':
+                            errorMessage = '❌ Password is too weak. Use at least 6 characters.';
+                            break;
+                        case 'auth/too-many-requests':
+                            errorMessage = '❌ Too many attempts. Please try again later.';
+                            break;
+                        case 'auth/network-request-failed':
+                            errorMessage = '❌ Network error. Check your internet connection.';
+                            break;
+                        default:
+                            errorMessage = `❌ ${error.message}`;
+                    }
+                    showMessage(errorMessage, 'error');
                 }
-                
-                showMessage(errorMessage, 'error');
 
             } finally {
                 registerBtn.disabled = false;
@@ -436,7 +421,6 @@
             }
         });
 
-        // ==================== KEYBOARD SHORTCUT ====================
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'd') {
                 e.preventDefault();
