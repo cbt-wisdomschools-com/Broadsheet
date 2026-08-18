@@ -1120,6 +1120,11 @@
                 if (docSnap.exists()) {
                     existingData = docSnap.data();
                     logDebug('📄 Found existing document, will merge subjects', 'info');
+                    
+                    // Check if existing subjects are empty
+                    if (!existingData.subjects || existingData.subjects.length === 0) {
+                        logDebug('⚠️ Existing subjects are empty, will create new subjects', 'warning');
+                    }
                 } else {
                     logDebug('📄 Creating new document', 'info');
                 }
@@ -1274,7 +1279,7 @@
             }
         }
 
-        // ==================== LOAD FROM FIRESTORE ====================
+        // ==================== FIXED: LOAD FROM FIRESTORE ====================
         async function loadFromFirestore(studentId = null) {
             logDebug('📥 Load from Firestore initiated', 'info');
             
@@ -1324,32 +1329,45 @@
                     delete data.studentId;
                     delete data.version;
                     
-                    // PRESERVE existing data structure and merge with loaded data
+                    // Get the existing data from the page
                     const existingData = window.currentData || JSON.parse(JSON.stringify(DEFAULT_DATA));
                     
-                    // Merge student data
-                    if (data.student) {
+                    // CRITICAL FIX: Only merge if subjects exist and have content
+                    // If Firestore has empty subjects, keep the local ones
+                    if (data.subjects && Array.isArray(data.subjects) && data.subjects.length > 0) {
+                        // Check if subjects have actual data (not all empty)
+                        const hasData = data.subjects.some(subj => 
+                            subj.test1 && subj.test1 !== '0' && subj.test1 !== '-'
+                        );
+                        
+                        if (hasData) {
+                            logDebug('📊 Firestore has subject data, merging...', 'info');
+                            data.subjects.forEach((loadedSubj, idx) => {
+                                if (existingData.subjects[idx]) {
+                                    for (let key in loadedSubj) {
+                                        if (loadedSubj[key] !== undefined && loadedSubj[key] !== null && loadedSubj[key] !== '-') {
+                                            existingData.subjects[idx][key] = loadedSubj[key];
+                                        }
+                                    }
+                                }
+                            });
+                        } else {
+                            logDebug('📊 Firestore subjects are empty, keeping local data', 'info');
+                        }
+                    } else {
+                        logDebug('📊 No subjects in Firestore, keeping local data', 'info');
+                    }
+                    
+                    // Merge student data (but keep local name if Firestore has empty)
+                    if (data.student && data.student.name) {
                         existingData.student = {
                             ...existingData.student,
                             ...data.student
                         };
                     }
                     
-                    // Merge subjects - PRESERVE existing values if loaded data has "-"
-                    if (data.subjects && Array.isArray(data.subjects)) {
-                        data.subjects.forEach((loadedSubj, idx) => {
-                            if (existingData.subjects[idx]) {
-                                for (let key in loadedSubj) {
-                                    if (loadedSubj[key] !== undefined && loadedSubj[key] !== null && loadedSubj[key] !== '-') {
-                                        existingData.subjects[idx][key] = loadedSubj[key];
-                                    }
-                                }
-                            }
-                        });
-                    }
-                    
-                    // Merge character development
-                    if (data.characterDevelopment) {
+                    // Merge character development (only if has data)
+                    if (data.characterDevelopment && data.characterDevelopment.length > 0) {
                         data.characterDevelopment.forEach((item, idx) => {
                             if (existingData.characterDevelopment[idx]) {
                                 existingData.characterDevelopment[idx] = {
@@ -1360,8 +1378,8 @@
                         });
                     }
                     
-                    // Merge practical skills
-                    if (data.practicalSkills) {
+                    // Merge practical skills (only if has data)
+                    if (data.practicalSkills && data.practicalSkills.length > 0) {
                         data.practicalSkills.forEach((item, idx) => {
                             if (existingData.practicalSkills[idx]) {
                                 existingData.practicalSkills[idx] = {
@@ -1372,8 +1390,8 @@
                         });
                     }
                     
-                    // Merge remarks
-                    if (data.remarks) {
+                    // Merge remarks (only if has data)
+                    if (data.remarks && data.remarks.length > 0) {
                         data.remarks.forEach((item, idx) => {
                             if (existingData.remarks[idx]) {
                                 existingData.remarks[idx] = {
