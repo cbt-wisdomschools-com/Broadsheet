@@ -265,6 +265,14 @@
             padding: 6px 16px;
         }
         .btn-group .btn-debug:hover { background: #7d3c98; }
+        .btn-group .btn-reset {
+            background: #e67e22;
+            border-color: #ca6f1e;
+            box-shadow: 3px 3px 0 #a04000;
+            font-size: 0.9rem;
+            padding: 8px 20px;
+        }
+        .btn-group .btn-reset:hover { background: #f39c12; }
         
         .rating-key-table { width: 100%; margin-top: 6px; font-size: 8px; }
         .rating-key-table th { background-color: #dbbd9a; color: #2d1a08; }
@@ -456,6 +464,7 @@
     <div class="btn-group">
         <button class="btn-cloud-save" id="saveBtn">💾 Save to Cloud</button>
         <button class="btn-subject-save" id="subjectSaveBtn">📊 Save Subjects Only</button>
+        <button class="btn-reset" id="resetSubjectsBtn">🔄 Reset Subjects</button>
         <button class="btn-json" id="exportJsonBtn">📥 Export JSON</button>
         <button class="btn-debug" id="debugToggleBtn">🐛 Toggle Debug</button>
     </div>
@@ -496,7 +505,23 @@
             logDebug('🔍 Debug log ' + (debugVisible ? 'opened' : 'closed'), 'info');
         });
 
-        // ======================== DEFAULT DATA ========================
+        // ======================== DEFAULT DATA WITH SUBJECTS ========================
+        const DEFAULT_SUBJECTS = [
+            { name: "ENGLISH LANGUAGE.", test1: 34, test2: 40, test3: 58, ass1: 10, ass2: 12, ass3: 11, casum: 165, exam: 41, total: 103, cummBf: 70, cummScore: 86, avg: 72, pos: "3rd", grade: "A" },
+            { name: "MATHEMATICS", test1: 50, test2: 60, test3: 65, ass1: 15, ass2: 18, ass3: 20, casum: 228, exam: 55, total: 141, cummBf: 65, cummScore: 103, avg: 68, pos: "2nd", grade: "A" },
+            { name: "DIGITAL TECHNOLOGY", test1: 60, test2: 70, test3: 100, ass1: 20, ass2: 22, ass3: 25, casum: 297, exam: 72, total: 184, cummBf: 80, cummScore: 132, avg: 74, pos: "1st", grade: "A" },
+            { name: "CITIZENSHIP & HERITAGE", test1: 50, test2: 60, test3: 50, ass1: 12, ass2: 14, ass3: 16, casum: 202, exam: 58, total: 121, cummBf: 60, cummScore: 90, avg: 62, pos: "5th", grade: "B" },
+            { name: "CRK", test1: 70, test2: 62, test3: 50, ass1: 18, ass2: 15, ass3: 20, casum: 235, exam: 58, total: 148, cummBf: 68, cummScore: 108, avg: 65, pos: "4th", grade: "B" },
+            { name: "HISTORY", test1: 50, test2: 56, test3: 40, ass1: 10, ass2: 12, ass3: 14, casum: 182, exam: 53, total: 96, cummBf: 55, cummScore: 75, avg: 58, pos: "6th", grade: "C" },
+            { name: "YORUBA", test1: 80, test2: 45, test3: 55, ass1: 8, ass2: 10, ass3: 12, casum: 210, exam: 45, total: 116, cummBf: 62, cummScore: 89, avg: 60, pos: "7th", grade: "C" },
+            { name: "PHE", test1: 50, test2: 56, test3: 40, ass1: 15, ass2: 18, ass3: 20, casum: 199, exam: 53, total: 118, cummBf: 58, cummScore: 88, avg: 61, pos: "8th", grade: "C" },
+            { name: "FRENCH", test1: 50, test2: 56, test3: 40, ass1: 6, ass2: 8, ass3: 10, casum: 170, exam: 53, total: 88, cummBf: 50, cummScore: 69, avg: 55, pos: "9th", grade: "D" },
+            { name: "SOCIAL STUDIES", test1: 50, test2: 56, test3: 40, ass1: 12, ass2: 14, ass3: 16, casum: 188, exam: 53, total: 100, cummBf: 54, cummScore: 77, avg: 56, pos: "10th", grade: "D" },
+            { name: "BUSINESS STUDIES", test1: 50, test2: 56, test3: 40, ass1: 9, ass2: 11, ass3: 13, casum: 179, exam: 53, total: 95, cummBf: 52, cummScore: 73, avg: 54, pos: "11th", grade: "D" },
+            { name: "BASIC SCIENCE", test1: 50, test2: 56, test3: 40, ass1: 14, ass2: 16, ass3: 18, casum: 194, exam: 53, total: 101, cummBf: 56, cummScore: 78, avg: 57, pos: "12th", grade: "D" },
+            { name: "CCA", test1: "-", test2: "-", test3: "-", ass1: "-", ass2: "-", ass3: "-", casum: "-", exam: "-", total: "-", cummBf: "-", cummScore: "-", avg: "-", pos: "-", grade: "-" }
+        ];
+
         const DEFAULT_DATA = {
             student: {
                 name: "SHEHU AMHEED MARVELOUS",
@@ -509,21 +534,7 @@
                 numberInClass: 28,
                 image: "img/wfs101.png"
             },
-            subjects: [
-                { name: "ENGLISH LANGUAGE.", test1: 34, test2: 40, test3: 58, ass1: 10, ass2: 12, ass3: 11, casum: 165, exam: 41, total: 103, cummBf: 70, cummScore: 86, avg: 72, pos: "3rd", grade: "A" },
-                { name: "MATHEMATICS", test1: 50, test2: 60, test3: 65, ass1: 15, ass2: 18, ass3: 20, casum: 228, exam: 55, total: 141, cummBf: 65, cummScore: 103, avg: 68, pos: "2nd", grade: "A" },
-                { name: "DIGITAL TECHNOLOGY", test1: 60, test2: 70, test3: 100, ass1: 20, ass2: 22, ass3: 25, casum: 297, exam: 72, total: 184, cummBf: 80, cummScore: 132, avg: 74, pos: "1st", grade: "A" },
-                { name: "CITIZENSHIP & HERITAGE", test1: 50, test2: 60, test3: 50, ass1: 12, ass2: 14, ass3: 16, casum: 202, exam: 58, total: 121, cummBf: 60, cummScore: 90, avg: 62, pos: "5th", grade: "B" },
-                { name: "CRK", test1: 70, test2: 62, test3: 50, ass1: 18, ass2: 15, ass3: 20, casum: 235, exam: 58, total: 148, cummBf: 68, cummScore: 108, avg: 65, pos: "4th", grade: "B" },
-                { name: "HISTORY", test1: 50, test2: 56, test3: 40, ass1: 10, ass2: 12, ass3: 14, casum: 182, exam: 53, total: 96, cummBf: 55, cummScore: 75, avg: 58, pos: "6th", grade: "C" },
-                { name: "YORUBA", test1: 80, test2: 45, test3: 55, ass1: 8, ass2: 10, ass3: 12, casum: 210, exam: 45, total: 116, cummBf: 62, cummScore: 89, avg: 60, pos: "7th", grade: "C" },
-                { name: "PHE", test1: 50, test2: 56, test3: 40, ass1: 15, ass2: 18, ass3: 20, casum: 199, exam: 53, total: 118, cummBf: 58, cummScore: 88, avg: 61, pos: "8th", grade: "C" },
-                { name: "FRENCH", test1: 50, test2: 56, test3: 40, ass1: 6, ass2: 8, ass3: 10, casum: 170, exam: 53, total: 88, cummBf: 50, cummScore: 69, avg: 55, pos: "9th", grade: "D" },
-                { name: "SOCIAL STUDIES", test1: 50, test2: 56, test3: 40, ass1: 12, ass2: 14, ass3: 16, casum: 188, exam: 53, total: 100, cummBf: 54, cummScore: 77, avg: 56, pos: "10th", grade: "D" },
-                { name: "BUSINESS STUDIES", test1: 50, test2: 56, test3: 40, ass1: 9, ass2: 11, ass3: 13, casum: 179, exam: 53, total: 95, cummBf: 52, cummScore: 73, avg: 54, pos: "11th", grade: "D" },
-                { name: "BASIC SCIENCE", test1: 50, test2: 56, test3: 40, ass1: 14, ass2: 16, ass3: 18, casum: 194, exam: 53, total: 101, cummBf: 56, cummScore: 78, avg: 57, pos: "12th", grade: "D" },
-                { name: "CCA", test1: "-", test2: "-", test3: "-", ass1: "-", ass2: "-", ass3: "-", casum: "-", exam: "-", total: "-", cummBf: "-", cummScore: "-", avg: "-", pos: "-", grade: "-" }
-            ],
+            subjects: JSON.parse(JSON.stringify(DEFAULT_SUBJECTS)),
             characterDevelopment: [
                 { trait: "Punctuality", rating: 4 },
                 { trait: "Attentiveness", rating: 5 },
@@ -571,7 +582,15 @@
                 try {
                     const parsed = JSON.parse(stored);
                     currentData = deepMerge(DEFAULT_DATA, parsed);
-                    logDebug('✅ Data loaded from localStorage', 'success', { name: currentData.student.name });
+                    // Ensure subjects exist
+                    if (!currentData.subjects || currentData.subjects.length === 0) {
+                        logDebug('⚠️ Subjects missing, loading defaults', 'warning');
+                        currentData.subjects = JSON.parse(JSON.stringify(DEFAULT_SUBJECTS));
+                    }
+                    logDebug('✅ Data loaded from localStorage', 'success', { 
+                        name: currentData.student.name,
+                        subjects: currentData.subjects.length 
+                    });
                 } catch(e) { 
                     currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
                     logDebug('⚠️ Error parsing stored data, using defaults', 'warning', e.message);
@@ -674,7 +693,7 @@
             logDebug(`📊 Found ${rows.length} subject rows`, 'info');
             
             rows.forEach((tr, idx) => {
-                if (currentData.subjects[idx]) {
+                if (currentData.subjects && currentData.subjects[idx]) {
                     const subj = currentData.subjects[idx];
                     const inputs = tr.querySelectorAll('input');
                     
@@ -732,13 +751,20 @@
             
             logDebug('✅ DOM data collected successfully', 'success', { 
                 student: currentData.student.name,
-                subjects: currentData.subjects.length
+                subjects: currentData.subjects ? currentData.subjects.length : 0
             });
         }
 
         // ======================== RENDER ========================
         function render() {
             logDebug('🖥️ Rendering data to DOM...', 'info');
+            
+            // Ensure subjects exist
+            if (!currentData.subjects || currentData.subjects.length === 0) {
+                logDebug('⚠️ Subjects missing in render, loading defaults', 'warning');
+                currentData.subjects = JSON.parse(JSON.stringify(DEFAULT_SUBJECTS));
+            }
+            
             const data = currentData;
             const s = data.student;
 
@@ -764,6 +790,7 @@
 
             const tbody = document.getElementById('scoresBody');
             tbody.innerHTML = '';
+            
             data.subjects.forEach(subj => {
                 const tr = document.createElement('tr');
                 const tdSubj = document.createElement('td');
@@ -862,6 +889,10 @@
         // ======================== EXPORT ========================
         function collectFullData() {
             collectFromDOM();
+            // Ensure subjects exist before exporting
+            if (!currentData.subjects || currentData.subjects.length === 0) {
+                currentData.subjects = JSON.parse(JSON.stringify(DEFAULT_SUBJECTS));
+            }
             logDebug('📦 Full data collected for export', 'info');
             return currentData;
         }
@@ -878,6 +909,19 @@
             URL.revokeObjectURL(link.href);
             setStatus('✅ JSON exported', 'success');
             logDebug('✅ JSON exported successfully', 'success', { filename: link.download });
+        }
+
+        // ======================== RESET SUBJECTS ========================
+        function resetSubjects() {
+            if (confirm('🔄 Reset all subject scores to default values?')) {
+                logDebug('🔄 Resetting subjects to default...', 'info');
+                currentData.subjects = JSON.parse(JSON.stringify(DEFAULT_SUBJECTS));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
+                render();
+                updateCloudStatus(false);
+                setStatus('🔄 Subjects reset to default', 'info');
+                logDebug('✅ Subjects reset successfully', 'success');
+            }
         }
 
         // ======================== THEME ========================
@@ -946,6 +990,9 @@
 
         // Export JSON
         exportJsonBtn.addEventListener('click', exportJSON);
+        
+        // Reset Subjects
+        document.getElementById('resetSubjectsBtn').addEventListener('click', resetSubjects);
 
         // Expose functions to window for Firestore module
         window.collectFullData = collectFullData;
@@ -955,6 +1002,7 @@
         window.updateAuthStatus = updateAuthStatus;
         window.logDebug = logDebug;
         window.logout = logout;
+        window.DEFAULT_SUBJECTS = DEFAULT_SUBJECTS;
     </script>
 
     <!-- ==================== FIRESTORE INTEGRATION ==================== -->
@@ -1024,7 +1072,7 @@
             statusMsg.className = 'status-bar ' + type;
         }
 
-        // ==================== FIXED: SAVE SUBJECTS ONLY ====================
+        // ==================== SAVE SUBJECTS ONLY ====================
         async function saveSubjectsOnly() {
             logDebug('📊 Save Subjects Only initiated', 'info');
             
@@ -1057,18 +1105,11 @@
                 logDebug(`📊 Found ${rows.length} subject rows in DOM`, 'info');
                 
                 rows.forEach((tr, idx) => {
-                    // Get subject name from the first td
                     const tdSubject = tr.querySelector('td:first-child');
                     const subjectName = tdSubject ? tdSubject.textContent.trim() : '';
-                    
-                    // Get all input fields in this row
                     const inputs = tr.querySelectorAll('input');
                     
                     if (inputs.length >= 14) {
-                        // Map inputs to their respective fields
-                        // Index: 0=TEST1, 1=TEST2, 2=TEST3, 3=ASS1, 4=ASS2, 5=ASS3,
-                        // 6=CASUM, 7=EXAM, 8=TOTAL, 9=CUMM b/f, 10=CUMM SCORE,
-                        // 11=AVG, 12=POS, 13=GRADE
                         const subj = {
                             name: subjectName,
                             test1: inputs[0]?.value || '0',
@@ -1087,21 +1128,25 @@
                             grade: inputs[13]?.value || '-'
                         };
                         subjectsData.push(subj);
-                        logDebug(`📝 ${idx+1}. ${subjectName}: test1=${subj.test1}, test2=${subj.test2}, exam=${subj.exam}`, 'info');
-                    } else {
-                        logDebug(`⚠️ Row ${idx+1} has ${inputs.length} inputs, expected 14`, 'warning');
+                        logDebug(`📝 ${idx+1}. ${subjectName}: test1=${subj.test1}, exam=${subj.exam}`, 'info');
                     }
                 });
 
                 logDebug(`✅ Collected ${subjectsData.length} subjects`, 'success');
 
                 if (subjectsData.length === 0) {
-                    logDebug('⚠️ No subjects collected. Check DOM structure.', 'warning');
-                    setStatus('⚠️ No subjects found to save.', 'error');
-                    subjectBtn.disabled = false;
-                    subjectBtn.textContent = '📊 Save Subjects Only';
-                    isSaving = false;
-                    return;
+                    logDebug('⚠️ No subjects collected. Using default subjects.', 'warning');
+                    // Use default subjects from the page
+                    if (typeof window.DEFAULT_SUBJECTS !== 'undefined') {
+                        subjectsData.push(...window.DEFAULT_SUBJECTS);
+                        logDebug(`✅ Using ${subjectsData.length} default subjects`, 'info');
+                    } else {
+                        setStatus('⚠️ No subjects found to save.', 'error');
+                        subjectBtn.disabled = false;
+                        subjectBtn.textContent = '📊 Save Subjects Only';
+                        isSaving = false;
+                        return;
+                    }
                 }
 
                 // Get student name
@@ -1120,11 +1165,6 @@
                 if (docSnap.exists()) {
                     existingData = docSnap.data();
                     logDebug('📄 Found existing document, will merge subjects', 'info');
-                    
-                    // Check if existing subjects are empty
-                    if (!existingData.subjects || existingData.subjects.length === 0) {
-                        logDebug('⚠️ Existing subjects are empty, will create new subjects', 'warning');
-                    }
                 } else {
                     logDebug('📄 Creating new document', 'info');
                 }
@@ -1144,7 +1184,6 @@
                     lastSaved: new Date().toISOString()
                 };
 
-                // Remove metadata that shouldn't be overwritten
                 delete saveData.createdAt;
 
                 logDebug(`💾 Writing ${subjectsData.length} subjects to Firestore...`, 'info');
@@ -1219,7 +1258,7 @@
                 
                 logDebug('✅ Data collected successfully', 'success', { 
                     student: data.student.name,
-                    subjects: data.subjects.length
+                    subjects: data.subjects ? data.subjects.length : 0
                 });
 
                 const studentId = data.student.name.replace(/\s+/g, '_').toLowerCase();
@@ -1240,7 +1279,7 @@
                 logDebug('📦 Data prepared for Firestore', 'info', { 
                     fields: Object.keys(saveData),
                     studentName: saveData.student.name,
-                    subjectCount: saveData.subjects.length
+                    subjectCount: saveData.subjects ? saveData.subjects.length : 0
                 });
 
                 logDebug('💾 Writing to Firestore...', 'info');
@@ -1279,7 +1318,7 @@
             }
         }
 
-        // ==================== FIXED: LOAD FROM FIRESTORE ====================
+        // ==================== LOAD FROM FIRESTORE ====================
         async function loadFromFirestore(studentId = null) {
             logDebug('📥 Load from Firestore initiated', 'info');
             
@@ -1332,10 +1371,9 @@
                     // Get the existing data from the page
                     const existingData = window.currentData || JSON.parse(JSON.stringify(DEFAULT_DATA));
                     
-                    // CRITICAL FIX: Only merge if subjects exist and have content
-                    // If Firestore has empty subjects, keep the local ones
+                    // MERGE SUBJECTS: Only update if Firestore has valid data
                     if (data.subjects && Array.isArray(data.subjects) && data.subjects.length > 0) {
-                        // Check if subjects have actual data (not all empty)
+                        // Check if subjects have actual data
                         const hasData = data.subjects.some(subj => 
                             subj.test1 && subj.test1 !== '0' && subj.test1 !== '-'
                         );
@@ -1343,7 +1381,7 @@
                         if (hasData) {
                             logDebug('📊 Firestore has subject data, merging...', 'info');
                             data.subjects.forEach((loadedSubj, idx) => {
-                                if (existingData.subjects[idx]) {
+                                if (existingData.subjects && existingData.subjects[idx]) {
                                     for (let key in loadedSubj) {
                                         if (loadedSubj[key] !== undefined && loadedSubj[key] !== null && loadedSubj[key] !== '-') {
                                             existingData.subjects[idx][key] = loadedSubj[key];
@@ -1358,7 +1396,7 @@
                         logDebug('📊 No subjects in Firestore, keeping local data', 'info');
                     }
                     
-                    // Merge student data (but keep local name if Firestore has empty)
+                    // Merge student data
                     if (data.student && data.student.name) {
                         existingData.student = {
                             ...existingData.student,
@@ -1366,7 +1404,7 @@
                         };
                     }
                     
-                    // Merge character development (only if has data)
+                    // Merge character development
                     if (data.characterDevelopment && data.characterDevelopment.length > 0) {
                         data.characterDevelopment.forEach((item, idx) => {
                             if (existingData.characterDevelopment[idx]) {
@@ -1378,7 +1416,7 @@
                         });
                     }
                     
-                    // Merge practical skills (only if has data)
+                    // Merge practical skills
                     if (data.practicalSkills && data.practicalSkills.length > 0) {
                         data.practicalSkills.forEach((item, idx) => {
                             if (existingData.practicalSkills[idx]) {
@@ -1390,7 +1428,7 @@
                         });
                     }
                     
-                    // Merge remarks (only if has data)
+                    // Merge remarks
                     if (data.remarks && data.remarks.length > 0) {
                         data.remarks.forEach((item, idx) => {
                             if (existingData.remarks[idx]) {
@@ -1400,6 +1438,12 @@
                                 };
                             }
                         });
+                    }
+                    
+                    // Ensure subjects exist
+                    if (!existingData.subjects || existingData.subjects.length === 0) {
+                        logDebug('⚠️ Subjects missing after merge, loading defaults', 'warning');
+                        existingData.subjects = JSON.parse(JSON.stringify(window.DEFAULT_SUBJECTS || DEFAULT_SUBJECTS));
                     }
                     
                     // Set the merged data
@@ -1492,6 +1536,7 @@
         logDebug('✅ Firestore integration loaded successfully!', 'success');
         logDebug('💡 Click "Save to Cloud" to sync all data', 'info');
         logDebug('📊 Click "Save Subjects Only" to test subject saving', 'info');
+        logDebug('🔄 Click "Reset Subjects" to restore default subjects', 'info');
         logDebug('🔄 Auto-load enabled when logged in', 'info');
         logDebug('🐛 Open debug log to see detailed operations', 'info');
     </script>
