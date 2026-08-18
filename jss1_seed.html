@@ -243,7 +243,7 @@
             }
         }
 
-        // ==================== DEFAULT DATA ====================
+        // ==================== DEFAULT DATA (FIXED - NO NESTED ARRAYS) ====================
         const DEFAULT_DATA = {
             student: {
                 name: "SHEHU AMHEED MARVELOUS",
@@ -256,20 +256,21 @@
                 numberInClass: 28,
                 image: "img/wfs101.png"
             },
+            // ✅ FIXED: Subjects as an array of objects instead of nested arrays
             subjects: [
-                ["ENGLISH LANGUAGE.", 34, 40, 58, 10, 12, 11, 165, 41, 103, 70, 86, 72, "3rd", "A"],
-                ["MATHEMATICS", 50, 60, 65, 15, 18, 20, 228, 55, 141, 65, 103, 68, "2nd", "A"],
-                ["DIGITAL TECHNOLOGY", 60, 70, 100, 20, 22, 25, 297, 72, 184, 80, 132, 74, "1st", "A"],
-                ["CITIZENSHIP & HERITAGE", 50, 60, 50, 12, 14, 16, 202, 58, 121, 60, 90, 62, "5th", "B"],
-                ["CRK", 70, 62, 50, 18, 15, 20, 235, 58, 148, 68, 108, 65, "4th", "B"],
-                ["HISTORY", 50, 56, 40, 10, 12, 14, 182, 53, 96, 55, 75, 58, "6th", "C"],
-                ["YORUBA", 80, 45, 55, 8, 10, 12, 210, 45, 116, 62, 89, 60, "7th", "C"],
-                ["PHE", 50, 56, 40, 15, 18, 20, 199, 53, 118, 58, 88, 61, "8th", "C"],
-                ["FRENCH", 50, 56, 40, 6, 8, 10, 170, 53, 88, 50, 69, 55, "9th", "D"],
-                ["SOCIAL STUDIES", 50, 56, 40, 12, 14, 16, 188, 53, 100, 54, 77, 56, "10th", "D"],
-                ["BUSINESS STUDIES", 50, 56, 40, 9, 11, 13, 179, 53, 95, 52, 73, 54, "11th", "D"],
-                ["BASIC SCIENCE", 50, 56, 40, 14, 16, 18, 194, 53, 101, 56, 78, 57, "12th", "D"],
-                ["CCA", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+                { name: "ENGLISH LANGUAGE.", test1: 34, test2: 40, test3: 58, ass1: 10, ass2: 12, ass3: 11, casum: 165, exam: 41, total: 103, cummBf: 70, cummScore: 86, avg: 72, pos: "3rd", grade: "A" },
+                { name: "MATHEMATICS", test1: 50, test2: 60, test3: 65, ass1: 15, ass2: 18, ass3: 20, casum: 228, exam: 55, total: 141, cummBf: 65, cummScore: 103, avg: 68, pos: "2nd", grade: "A" },
+                { name: "DIGITAL TECHNOLOGY", test1: 60, test2: 70, test3: 100, ass1: 20, ass2: 22, ass3: 25, casum: 297, exam: 72, total: 184, cummBf: 80, cummScore: 132, avg: 74, pos: "1st", grade: "A" },
+                { name: "CITIZENSHIP & HERITAGE", test1: 50, test2: 60, test3: 50, ass1: 12, ass2: 14, ass3: 16, casum: 202, exam: 58, total: 121, cummBf: 60, cummScore: 90, avg: 62, pos: "5th", grade: "B" },
+                { name: "CRK", test1: 70, test2: 62, test3: 50, ass1: 18, ass2: 15, ass3: 20, casum: 235, exam: 58, total: 148, cummBf: 68, cummScore: 108, avg: 65, pos: "4th", grade: "B" },
+                { name: "HISTORY", test1: 50, test2: 56, test3: 40, ass1: 10, ass2: 12, ass3: 14, casum: 182, exam: 53, total: 96, cummBf: 55, cummScore: 75, avg: 58, pos: "6th", grade: "C" },
+                { name: "YORUBA", test1: 80, test2: 45, test3: 55, ass1: 8, ass2: 10, ass3: 12, casum: 210, exam: 45, total: 116, cummBf: 62, cummScore: 89, avg: 60, pos: "7th", grade: "C" },
+                { name: "PHE", test1: 50, test2: 56, test3: 40, ass1: 15, ass2: 18, ass3: 20, casum: 199, exam: 53, total: 118, cummBf: 58, cummScore: 88, avg: 61, pos: "8th", grade: "C" },
+                { name: "FRENCH", test1: 50, test2: 56, test3: 40, ass1: 6, ass2: 8, ass3: 10, casum: 170, exam: 53, total: 88, cummBf: 50, cummScore: 69, avg: 55, pos: "9th", grade: "D" },
+                { name: "SOCIAL STUDIES", test1: 50, test2: 56, test3: 40, ass1: 12, ass2: 14, ass3: 16, casum: 188, exam: 53, total: 100, cummBf: 54, cummScore: 77, avg: 56, pos: "10th", grade: "D" },
+                { name: "BUSINESS STUDIES", test1: 50, test2: 56, test3: 40, ass1: 9, ass2: 11, ass3: 13, casum: 179, exam: 53, total: 95, cummBf: 52, cummScore: 73, avg: 54, pos: "11th", grade: "D" },
+                { name: "BASIC SCIENCE", test1: 50, test2: 56, test3: 40, ass1: 14, ass2: 16, ass3: 18, casum: 194, exam: 53, total: 101, cummBf: 56, cummScore: 78, avg: 57, pos: "12th", grade: "D" },
+                { name: "CCA", test1: "-", test2: "-", test3: "-", ass1: "-", ass2: "-", ass3: "-", casum: "-", exam: "-", total: "-", cummBf: "-", cummScore: "-", avg: "-", pos: "-", grade: "-" }
             ],
             characterDevelopment: [
                 { trait: "Punctuality", rating: 4 },
@@ -344,7 +345,7 @@
                     version: '1.0'
                 };
 
-                log('📦 Seed data prepared', 'info');
+                log('📦 Seed data prepared (no nested arrays!)', 'info');
                 setProgress(40);
 
                 // Check if document already exists
@@ -369,12 +370,10 @@
             } catch (error) {
                 log(`❌ Error seeding data: ${error.message}`, 'error', error);
                 
-                // Provide more helpful error message
                 let errorMsg = error.message;
                 if (error.code === 'permission-denied') {
                     errorMsg = 'Permission denied. Please check your Firestore rules.';
                     log('🔑 Firestore rules are blocking the write operation.', 'error');
-                    log('📝 Go to Firebase Console → Cloud Firestore → Rules and update them.', 'error');
                 }
                 
                 showStatus(`❌ Error: ${errorMsg}`, 'error');
