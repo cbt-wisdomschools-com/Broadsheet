@@ -42,8 +42,6 @@
             z-index: 1;
             min-height: 100vh;
         }
-        
-        /* ===== WATERMARK LOGO ===== */
         body::before {
             content: "";
             position: fixed;
@@ -59,54 +57,6 @@
             z-index: 0;
             transition: opacity 0.3s;
         }
-        
-        /* ===== TOP LEFT LOGOUT BUTTON ===== */
-        .top-left-bar {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 1000;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .btn-logout-top {
-            background: #c0392b;
-            color: white;
-            border: 2px solid #922b21;
-            padding: 8px 20px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.85rem;
-            box-shadow: 3px 3px 0 #6c1f1a;
-            transition: 0.2s;
-            display: inline-block;
-        }
-        .btn-logout-top:hover {
-            background: #e74c3c;
-            transform: translate(2px, 2px);
-            box-shadow: 1px 1px 0 #6c1f1a;
-        }
-        
-        /* ===== DARK MODE TOGGLE - TOP RIGHT ===== */
-        .theme-toggle {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            background: var(--th-bg);
-            color: var(--th-color);
-            border: 2px solid var(--table-border);
-            padding: 8px 16px;
-            border-radius: 40px;
-            cursor: pointer;
-            z-index: 1000;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: 0.2s;
-        }
-        .theme-toggle:hover { transform: scale(1.03); }
-
         .logo {
             text-align: center;
             margin-bottom: 16px;
@@ -257,7 +207,22 @@
             padding: 6px 16px;
         }
         .btn-group .btn-debug:hover { background: #7d3c98; }
-        
+        .theme-toggle {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            background: var(--th-bg);
+            color: var(--th-color);
+            border: 2px solid var(--table-border);
+            padding: 6px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            z-index: 1000;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .theme-toggle:hover { transform: scale(1.03); }
         .rating-key-table { width: 100%; margin-top: 6px; font-size: 8px; }
         .rating-key-table th { background-color: #dbbd9a; color: #2d1a08; }
         .unified-rating-key {
@@ -361,7 +326,7 @@
         @media print {
             body { font-size: 7px; margin: 4px; background: white; color: black; }
             body::before { opacity: 0.06; width: 50vw; height: 50vh; }
-            .top-left-bar, .theme-toggle, .btn-group, .debug-container { display: none; }
+            .theme-toggle, .btn-group, .debug-container { display: none; }
             .report-box { border: 1px solid #7d4a1a; background: white; }
             th { background: #7d4a1a; color: white; }
             input { border: none; background: transparent; }
@@ -371,19 +336,10 @@
             .side-by-side { flex-direction: column; }
             .table-small { flex: 1 1 100%; }
             body::before { width: 85vw; height: 85vh; }
-            .top-left-bar { top: 10px; left: 10px; }
-            .btn-logout-top { font-size: 0.7rem; padding: 5px 14px; }
-            .theme-toggle { font-size: 0.7rem; padding: 5px 12px; top: 10px; right: 10px; }
         }
     </style>
 </head>
 <body>
-    <!-- ===== TOP LEFT LOGOUT BUTTON ===== -->
-    <div class="top-left-bar">
-        <button class="btn-logout-top" id="logoutTopBtn">🚪 Logout</button>
-    </div>
-
-    <!-- ===== TOP RIGHT DARK MODE TOGGLE ===== -->
     <button class="theme-toggle" id="themeToggle">🌙 Dark Mode</button>
 
     <div class="logo">
@@ -872,24 +828,6 @@
             themeToggle.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
         });
 
-        // ======================== LOGOUT FUNCTION ========================
-        function logout() {
-            logDebug('🚪 Logging out...', 'info');
-            // Clear any session data
-            localStorage.removeItem('wisdom_auth_user');
-            localStorage.removeItem('wisdom_current_student_id');
-            // Redirect to index.html
-            window.location.href = 'index.html';
-        }
-
-        // ======================== LOGOUT BUTTON ========================
-        document.getElementById('logoutTopBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('🚪 Are you sure you want to logout?')) {
-                logout();
-            }
-        });
-
         // ======================== INIT ========================
         logDebug('🚀 Application starting...', 'info');
         loadData();
@@ -930,7 +868,6 @@
         window.updateCloudStatus = updateCloudStatus;
         window.updateAuthStatus = updateAuthStatus;
         window.logDebug = logDebug;
-        window.logout = logout;
     </script>
 
     <!-- ==================== FIRESTORE INTEGRATION ==================== -->
@@ -988,6 +925,7 @@
 
         // ==================== DEBUG LOGGER (module version) ====================
         function logDebug(message, type = 'info', data = null) {
+            // Call the main page's logDebug function
             if (typeof window.logDebug === 'function') {
                 window.logDebug(`[Firestore] ${message}`, type, data);
             }
@@ -1026,6 +964,7 @@
             logDebug('⏳ Starting save operation...', 'info');
 
             try {
+                // Collect data from DOM
                 logDebug('📊 Collecting data from DOM...', 'info');
                 const data = window.collectFullData ? window.collectFullData() : null;
                 
@@ -1035,7 +974,10 @@
                 
                 logDebug('✅ Data collected successfully', 'success', { 
                     student: data.student.name,
-                    subjects: data.subjects.length
+                    subjects: data.subjects.length,
+                    hasCharacter: !!data.characterDevelopment,
+                    hasPractical: !!data.practicalSkills,
+                    hasRemarks: !!data.remarks
                 });
 
                 const studentId = data.student.name.replace(/\s+/g, '_').toLowerCase();
@@ -1063,6 +1005,7 @@
                 
                 logDebug('✅ Firestore write successful!', 'success');
                 
+                // Store the student ID for future reference
                 localStorage.setItem('wisdom_current_student_id', studentId);
                 
                 setStatus(`✅ Data saved to Firestore for ${data.student.name}!`, 'success');
@@ -1134,6 +1077,7 @@
                         lastSaved: data.lastSaved
                     });
                     
+                    // Remove metadata before loading
                     delete data.ownerId;
                     delete data.ownerEmail;
                     delete data.updatedAt;
@@ -1141,12 +1085,14 @@
                     delete data.createdAt;
                     delete data.studentId;
                     
+                    // Update the data
                     if (typeof window.currentData !== 'undefined') {
                         window.currentData = data;
                     }
                     localStorage.setItem('wisdom_score_sheet_data', JSON.stringify(data));
                     localStorage.setItem('wisdom_current_student_id', studentId);
                     
+                    // Re-render
                     if (typeof window.render === 'function') {
                         window.render();
                         logDebug('✅ DOM re-rendered with loaded data', 'success');
@@ -1188,6 +1134,7 @@
                 }
                 setStatus(`✅ Logged in as: ${user.email}`, 'success');
                 
+                // Auto-load if we have a student ID
                 const studentId = localStorage.getItem('wisdom_current_student_id');
                 if (studentId) {
                     logDebug(`🔄 Auto-loading data for: ${studentId}`, 'info');
