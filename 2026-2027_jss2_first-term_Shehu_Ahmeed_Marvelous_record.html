@@ -669,7 +669,7 @@
                 }
             });
 
-            // --- SUBJECTS DATA (FIXED WITH DEBUG LOGGING) ---
+            // --- SUBJECTS DATA ---
             const rows = document.querySelectorAll('#scoresBody tr');
             logDebug(`📊 Found ${rows.length} subject rows`, 'info');
             
@@ -682,9 +682,6 @@
                     subj.name = subjectName;
                     
                     if (inputs.length >= 15) {
-                        // Log each subject's values before collection
-                        logDebug(`📝 Subject ${idx + 1}: ${subjectName} - Collecting values...`, 'info');
-                        
                         subj.test1 = inputs[1]?.value || '0';
                         subj.test2 = inputs[2]?.value || '0';
                         subj.test3 = inputs[3]?.value || '0';
@@ -699,9 +696,6 @@
                         subj.avg = inputs[12]?.value || '0';
                         subj.pos = inputs[13]?.value || '-';
                         subj.grade = inputs[14]?.value || '-';
-                        
-                        // Log collected values for debugging
-                        logDebug(`📊 ${subjectName}: test1=${subj.test1}, test2=${subj.test2}, test3=${subj.test3}, exam=${subj.exam}`, 'info');
                     }
                 }
             });
@@ -1030,7 +1024,7 @@
             statusMsg.className = 'status-bar ' + type;
         }
 
-        // ==================== SAVE SUBJECTS ONLY (For Debugging) ====================
+        // ==================== FIXED: SAVE SUBJECTS ONLY ====================
         async function saveSubjectsOnly() {
             logDebug('📊 Save Subjects Only initiated', 'info');
             
@@ -1055,42 +1049,67 @@
             try {
                 logDebug('📊 Collecting subject data from DOM...', 'info');
                 
-                // Collect only subject data
-                const rows = document.querySelectorAll('#scoresBody tr');
+                // Get the tbody directly
+                const tbody = document.getElementById('scoresBody');
+                const rows = tbody ? tbody.querySelectorAll('tr') : [];
                 const subjectsData = [];
                 
+                logDebug(`📊 Found ${rows.length} subject rows in DOM`, 'info');
+                
                 rows.forEach((tr, idx) => {
-                    const inputs = tr.querySelectorAll('input');
-                    const subjectName = tr.querySelector('td:first-child')?.textContent || '';
+                    // Get subject name from the first td
+                    const tdSubject = tr.querySelector('td:first-child');
+                    const subjectName = tdSubject ? tdSubject.textContent.trim() : '';
                     
-                    if (inputs.length >= 15) {
+                    // Get all input fields in this row
+                    const inputs = tr.querySelectorAll('input');
+                    
+                    if (inputs.length >= 14) {
+                        // Map inputs to their respective fields
+                        // Index: 0=TEST1, 1=TEST2, 2=TEST3, 3=ASS1, 4=ASS2, 5=ASS3,
+                        // 6=CASUM, 7=EXAM, 8=TOTAL, 9=CUMM b/f, 10=CUMM SCORE,
+                        // 11=AVG, 12=POS, 13=GRADE
                         const subj = {
                             name: subjectName,
-                            test1: inputs[1]?.value || '0',
-                            test2: inputs[2]?.value || '0',
-                            test3: inputs[3]?.value || '0',
-                            ass1: inputs[4]?.value || '0',
-                            ass2: inputs[5]?.value || '0',
-                            ass3: inputs[6]?.value || '0',
-                            casum: inputs[7]?.value || '0',
-                            exam: inputs[8]?.value || '0',
-                            total: inputs[9]?.value || '0',
-                            cummBf: inputs[10]?.value || '0',
-                            cummScore: inputs[11]?.value || '0',
-                            avg: inputs[12]?.value || '0',
-                            pos: inputs[13]?.value || '-',
-                            grade: inputs[14]?.value || '-'
+                            test1: inputs[0]?.value || '0',
+                            test2: inputs[1]?.value || '0',
+                            test3: inputs[2]?.value || '0',
+                            ass1: inputs[3]?.value || '0',
+                            ass2: inputs[4]?.value || '0',
+                            ass3: inputs[5]?.value || '0',
+                            casum: inputs[6]?.value || '0',
+                            exam: inputs[7]?.value || '0',
+                            total: inputs[8]?.value || '0',
+                            cummBf: inputs[9]?.value || '0',
+                            cummScore: inputs[10]?.value || '0',
+                            avg: inputs[11]?.value || '0',
+                            pos: inputs[12]?.value || '-',
+                            grade: inputs[13]?.value || '-'
                         };
                         subjectsData.push(subj);
-                        logDebug(`📝 ${subjectName}: test1=${subj.test1}, test2=${subj.test2}, exam=${subj.exam}`, 'info');
+                        logDebug(`📝 ${idx+1}. ${subjectName}: test1=${subj.test1}, test2=${subj.test2}, exam=${subj.exam}`, 'info');
+                    } else {
+                        logDebug(`⚠️ Row ${idx+1} has ${inputs.length} inputs, expected 14`, 'warning');
                     }
                 });
 
                 logDebug(`✅ Collected ${subjectsData.length} subjects`, 'success');
 
-                // Get student name for document ID
+                if (subjectsData.length === 0) {
+                    logDebug('⚠️ No subjects collected. Check DOM structure.', 'warning');
+                    setStatus('⚠️ No subjects found to save.', 'error');
+                    subjectBtn.disabled = false;
+                    subjectBtn.textContent = '📊 Save Subjects Only';
+                    isSaving = false;
+                    return;
+                }
+
+                // Get student name
                 const studentNameInput = document.querySelector('#bioDataContainer input[data-key="name"]');
-                const studentName = studentNameInput ? studentNameInput.value : currentData.student.name;
+                let studentName = 'SHEHU AMHEED MARVELOUS';
+                if (studentNameInput && studentNameInput.value) {
+                    studentName = studentNameInput.value;
+                }
                 const studentId = studentName.replace(/\s+/g, '_').toLowerCase();
 
                 // Get existing data from Firestore
@@ -1123,7 +1142,7 @@
                 // Remove metadata that shouldn't be overwritten
                 delete saveData.createdAt;
 
-                logDebug('💾 Writing subjects to Firestore...', 'info');
+                logDebug(`💾 Writing ${subjectsData.length} subjects to Firestore...`, 'info');
                 await setDoc(docRef, saveData, { merge: true });
                 
                 logDebug('✅ Subjects saved to Firestore successfully!', 'success');
@@ -1133,7 +1152,7 @@
                     window.currentData.subjects = subjectsData;
                 }
                 
-                setStatus(`✅ Subjects saved to Firestore for ${studentName}!`, 'success');
+                setStatus(`✅ ${subjectsData.length} subjects saved to Firestore!`, 'success');
                 if (typeof window.updateCloudStatus === 'function') {
                     window.updateCloudStatus(true);
                 }
