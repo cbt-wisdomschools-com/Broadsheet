@@ -199,6 +199,14 @@
         }
         .btn-group .btn-json { background: #1e2f3f; border-color: #1a2937; box-shadow: 3px 3px 0 #0f1a24; }
         .btn-group .btn-json:hover { background: #2c4055; }
+        .btn-group .btn-debug { 
+            background: #6c3483; 
+            border-color: #4a235a; 
+            box-shadow: 3px 3px 0 #2c1a3a;
+            font-size: 0.8rem;
+            padding: 6px 16px;
+        }
+        .btn-group .btn-debug:hover { background: #7d3c98; }
         .theme-toggle {
             position: fixed;
             top: 12px;
@@ -251,6 +259,7 @@
         .status-bar.error { color: #c0392b; background: #fee; }
         .status-bar.info { color: #1565c0; background: #e3f2fd; }
         .status-bar.saving { color: #e65100; background: #fff3e0; animation: pulse 1s infinite; }
+        .status-bar.debug { color: #6c3483; background: #f4ecf7; font-family: monospace; font-size: 0.7rem; }
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.6; }
@@ -272,10 +281,52 @@
         .cloud-status.synced { color: #2e7d32; }
         .cloud-status.unsynced { color: #e65100; }
         .cloud-status.saving { color: #f39c12; }
+        .debug-container {
+            margin-top: 15px;
+            border-top: 2px solid #b87c44;
+            padding-top: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        .debug-toggle {
+            background: #6c3483;
+            color: white;
+            border: 2px solid #4a235a;
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: 0.2s;
+            margin-bottom: 8px;
+        }
+        .debug-toggle:hover { background: #7d3c98; }
+        .debug-log {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            display: none;
+            border: 2px solid #6c3483;
+        }
+        .debug-log.show { display: block; }
+        .debug-log .timestamp { color: #858585; }
+        .debug-log .success { color: #81c784; }
+        .debug-log .error { color: #ef5350; }
+        .debug-log .info { color: #4fc3f7; }
+        .debug-log .warning { color: #ffd54f; }
+        .debug-log .data { color: #ce93d8; }
+        .debug-log .firebase { color: #ffab40; }
         @media print {
             body { font-size: 7px; margin: 4px; background: white; color: black; }
             body::before { opacity: 0.06; width: 50vw; height: 50vh; }
-            .theme-toggle, .btn-group { display: none; }
+            .theme-toggle, .btn-group, .debug-container { display: none; }
             .report-box { border: 1px solid #7d4a1a; background: white; }
             th { background: #7d4a1a; color: white; }
             input { border: none; background: transparent; }
@@ -306,11 +357,9 @@
     <div class="report-box">
         <h2 style="color:var(--text-color);">📋 SCORE SHEET — ALL DATA EDITABLE</h2>
 
-        <!-- BIO DATA (editable) -->
         <div class="side-by-side" id="bioDataContainer"></div>
         <hr style="border-color:#b87c44;">
 
-        <!-- ACADEMIC SCORES TABLE with input fields -->
         <div class="report-box">
             <h3 style="color:var(--text-color);">Academic Scores (edit all fields)</h3>
             <table class="score-table" id="subjectScores">
@@ -330,10 +379,8 @@
         <h6 style="color:var(--text-color);">Grading: 75+ A (Excellent) · 65-74 B (Good) · 50-64 C (Average) · 40-49 D (Fair) · 0-39 F (Poor)</h6>
         <hr style="border-color:#b87c44;">
 
-        <!-- CHARACTER & PRACTICAL SKILLS (editable) -->
         <div class="side-by-side" id="skillsContainer"></div>
 
-        <!-- RATING KEY -->
         <div class="unified-rating-key">
             <h3 style="color:var(--text-color);">Rating Key</h3>
             <table class="rating-key-table">
@@ -347,7 +394,6 @@
         </div>
         <hr style="border-color:#b87c44;">
 
-        <!-- REMARKS (editable) -->
         <h3 style="color:var(--text-color);">Remarks</h3>
         <table id="remarksTable">
             <tr><th>Category</th><th>Remarks</th><th>Signature/Date</th></tr>
@@ -358,11 +404,47 @@
     <div class="btn-group">
         <button class="btn-cloud-save" id="saveBtn">💾 Save to Cloud</button>
         <button class="btn-json" id="exportJsonBtn">📥 Export JSON</button>
+        <button class="btn-debug" id="debugToggleBtn">🐛 Toggle Debug</button>
     </div>
     <div class="status-bar" id="statusMsg">Ready · Auto-save enabled</div>
 
+    <!-- ==================== DEBUG LOG ==================== -->
+    <div class="debug-container">
+        <div class="debug-log" id="debugLog"></div>
+    </div>
+
     <!-- ==================== MAIN SCRIPT ==================== -->
     <script>
+        // ======================== DEBUG LOGGER ========================
+        const debugLog = document.getElementById('debugLog');
+        let debugVisible = false;
+
+        function logDebug(message, type = 'info', data = null) {
+            const timestamp = new Date().toISOString();
+            const entry = document.createElement('div');
+            const dataStr = data ? `\n📦 ${typeof data === 'object' ? JSON.stringify(data, null, 2) : data}` : '';
+            entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="${type}">${message}</span>${dataStr}`;
+            debugLog.appendChild(entry);
+            debugLog.scrollTop = debugLog.scrollHeight;
+            
+            // Also log to console
+            console.log(`[DEBUG] ${message}`, data || '');
+            
+            // Update status bar with debug info
+            const statusMsg = document.getElementById('statusMsg');
+            if (type === 'error') {
+                statusMsg.textContent = `❌ ${message}`;
+                statusMsg.className = 'status-bar error';
+            }
+        }
+
+        document.getElementById('debugToggleBtn').addEventListener('click', () => {
+            debugVisible = !debugVisible;
+            debugLog.classList.toggle('show');
+            document.getElementById('debugToggleBtn').textContent = debugVisible ? '🐛 Hide Debug' : '🐛 Toggle Debug';
+            logDebug('🔍 Debug log ' + (debugVisible ? 'opened' : 'closed'), 'info');
+        });
+
         // ======================== DEFAULT DATA ========================
         const DEFAULT_DATA = {
             student: {
@@ -429,6 +511,7 @@
 
         // ======================== LOAD / SAVE ========================
         function loadData() {
+            logDebug('📂 Loading data from localStorage...', 'info');
             const stored = localStorage.getItem(STORAGE_KEY);
             const savedId = localStorage.getItem(STUDENT_ID_KEY);
             
@@ -436,12 +519,20 @@
                 try {
                     const parsed = JSON.parse(stored);
                     currentData = deepMerge(DEFAULT_DATA, parsed);
-                } catch(e) { currentData = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+                    logDebug('✅ Data loaded from localStorage', 'success', { name: currentData.student.name });
+                } catch(e) { 
+                    currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                    logDebug('⚠️ Error parsing stored data, using defaults', 'warning', e.message);
+                }
             } else {
                 currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                logDebug('📄 No stored data found, using defaults', 'info');
             }
             
-            if (savedId) currentStudentId = savedId;
+            if (savedId) {
+                currentStudentId = savedId;
+                logDebug(`📌 Student ID: ${savedId}`, 'info');
+            }
             return currentData;
         }
 
@@ -453,6 +544,7 @@
             }
             updateCloudStatus(false);
             setStatus('💾 Data saved locally', 'info');
+            logDebug('💾 Data saved to localStorage', 'info');
         }
 
         function deepMerge(target, source) {
@@ -470,7 +562,6 @@
         function setStatus(text, type = 'info') {
             statusMsg.textContent = text;
             statusMsg.className = 'status-bar ' + type;
-            console.log(`[SCORE] ${text}`);
         }
 
         function updateCloudStatus(synced) {
@@ -480,11 +571,13 @@
                 cloudStatus.textContent = '☁️ Synced ✓';
                 saveBtn.className = 'btn-cloud-save saved';
                 saveBtn.textContent = '✅ Saved to Cloud';
+                logDebug('☁️ Cloud status: Synced ✓', 'success');
             } else {
                 cloudStatus.className = 'cloud-status unsynced';
                 cloudStatus.textContent = '☁️ Unsaved';
                 saveBtn.className = 'btn-cloud-save';
                 saveBtn.textContent = '💾 Save to Cloud';
+                logDebug('☁️ Cloud status: Unsaved', 'warning');
             }
         }
 
@@ -493,16 +586,20 @@
                 authStatus.className = 'login-badge logged-in';
                 authStatus.textContent = `🔐 ${user.email}`;
                 saveBtn.disabled = false;
+                logDebug(`🔐 User authenticated: ${user.email}`, 'success', { uid: user.uid });
             } else {
                 authStatus.className = 'login-badge logged-out';
                 authStatus.textContent = '🔓 Not Logged In';
                 saveBtn.disabled = true;
                 saveBtn.title = 'Please login to save to cloud';
+                logDebug('🔓 User not authenticated', 'warning');
             }
         }
 
         // ======================== COLLECT FROM DOM ========================
         function collectFromDOM() {
+            logDebug('📊 Collecting data from DOM...', 'info');
+            
             const bioInputs = document.querySelectorAll('#bioDataContainer input');
             bioInputs.forEach(inp => {
                 const key = inp.dataset.key;
@@ -565,10 +662,13 @@
                     currentData.remarks[idx].text = inputs[1].value;
                 }
             });
+            
+            logDebug('✅ DOM data collected successfully', 'success', { student: currentData.student.name });
         }
 
         // ======================== RENDER ========================
         function render() {
+            logDebug('🖥️ Rendering data to DOM...', 'info');
             const data = currentData;
             const s = data.student;
 
@@ -649,6 +749,7 @@
             });
 
             autoCalculate();
+            logDebug('✅ DOM rendered successfully', 'success');
         }
 
         // ======================== AUTO CALCULATE ========================
@@ -691,10 +792,12 @@
         // ======================== EXPORT ========================
         function collectFullData() {
             collectFromDOM();
+            logDebug('📦 Full data collected for export', 'info');
             return currentData;
         }
 
         function exportJSON() {
+            logDebug('📥 Exporting JSON...', 'info');
             const data = collectFullData();
             const json = JSON.stringify(data, null, 2);
             const blob = new Blob([json], { type: 'application/json' });
@@ -704,6 +807,7 @@
             link.click();
             URL.revokeObjectURL(link.href);
             setStatus('✅ JSON exported', 'success');
+            logDebug('✅ JSON exported successfully', 'success', { filename: link.download });
         }
 
         // ======================== THEME ========================
@@ -725,9 +829,11 @@
         });
 
         // ======================== INIT ========================
+        logDebug('🚀 Application starting...', 'info');
         loadData();
         render();
         updateCloudStatus(false);
+        logDebug('✅ Application ready', 'success');
 
         // Auto-save to localStorage on input change
         document.addEventListener('input', function(e) {
@@ -755,8 +861,13 @@
         // Export JSON
         exportJsonBtn.addEventListener('click', exportJSON);
 
-        console.log('✅ Score Sheet loaded. Data stored in localStorage.');
-        console.log('💡 Click "Save to Cloud" to sync to Firestore');
+        // Expose functions to window for Firestore module
+        window.collectFullData = collectFullData;
+        window.render = render;
+        window.currentData = currentData;
+        window.updateCloudStatus = updateCloudStatus;
+        window.updateAuthStatus = updateAuthStatus;
+        window.logDebug = logDebug;
     </script>
 
     <!-- ==================== FIRESTORE INTEGRATION ==================== -->
@@ -787,60 +898,93 @@
         };
 
         // ==================== INITIALIZE ====================
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        logDebug('🔥 Initializing Firebase...', 'info');
+        
+        try {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            
+            window.firebaseApp = app;
+            window.firebaseAuth = auth;
+            window.firebaseDb = db;
+            
+            logDebug('✅ Firebase initialized successfully', 'success', { 
+                projectId: firebaseConfig.projectId,
+                authDomain: firebaseConfig.authDomain
+            });
+        } catch (error) {
+            logDebug('❌ Firebase initialization failed', 'error', error.message);
+        }
+
+        const auth = getAuth();
+        const db = getFirestore();
 
         let currentUser = null;
         let isSaving = false;
 
-        // ==================== STATUS FUNCTIONS ====================
+        // ==================== DEBUG LOGGER (module version) ====================
+        function logDebug(message, type = 'info', data = null) {
+            // Call the main page's logDebug function
+            if (typeof window.logDebug === 'function') {
+                window.logDebug(`[Firestore] ${message}`, type, data);
+            }
+            console.log(`[FIRESTORE] ${message}`, data || '');
+        }
+
         function setStatus(text, type = 'info') {
             const statusMsg = document.getElementById('statusMsg');
             statusMsg.textContent = text;
             statusMsg.className = 'status-bar ' + type;
-            console.log(`[SCORE] ${text}`);
-        }
-
-        function updateCloudStatus(synced) {
-            // This function is called from the main script
-            if (typeof window.updateCloudStatus === 'function') {
-                window.updateCloudStatus(synced);
-            }
-        }
-
-        function updateAuthStatus(user) {
-            if (typeof window.updateAuthStatus === 'function') {
-                window.updateAuthStatus(user);
-            }
         }
 
         // ==================== SAVE TO FIRESTORE ====================
         async function saveToFirestore() {
+            logDebug('💾 Save to Firestore initiated', 'info');
+            
             if (!currentUser) {
+                logDebug('❌ Save failed: User not logged in', 'error');
                 setStatus('⚠️ Please login to save to Firestore', 'error');
                 return;
             }
+            
+            logDebug(`👤 User: ${currentUser.email} (${currentUser.uid})`, 'info');
 
-            if (isSaving) return;
+            if (isSaving) {
+                logDebug('⏳ Save already in progress, skipping', 'warning');
+                return;
+            }
+            
             isSaving = true;
-
             const saveBtn = document.getElementById('saveBtn');
             saveBtn.disabled = true;
             saveBtn.className = 'btn-cloud-save saving';
             saveBtn.textContent = '⏳ Saving...';
             setStatus('⏳ Saving to Firestore...', 'saving');
+            logDebug('⏳ Starting save operation...', 'info');
 
             try {
                 // Collect data from DOM
+                logDebug('📊 Collecting data from DOM...', 'info');
                 const data = window.collectFullData ? window.collectFullData() : null;
+                
                 if (!data) {
-                    throw new Error('Could not collect data');
+                    throw new Error('Could not collect data from DOM');
                 }
+                
+                logDebug('✅ Data collected successfully', 'success', { 
+                    student: data.student.name,
+                    subjects: data.subjects.length,
+                    hasCharacter: !!data.characterDevelopment,
+                    hasPractical: !!data.practicalSkills,
+                    hasRemarks: !!data.remarks
+                });
 
                 const studentId = data.student.name.replace(/\s+/g, '_').toLowerCase();
+                logDebug(`📌 Student ID: ${studentId}`, 'info');
                 
                 const docRef = doc(db, 'scoreSheets', studentId);
+                logDebug(`📄 Document reference: scoreSheets/${studentId}`, 'info');
                 
                 const saveData = {
                     ...data,
@@ -850,52 +994,89 @@
                     updatedAt: serverTimestamp(),
                     lastSaved: new Date().toISOString()
                 };
+                
+                logDebug('📦 Data prepared for Firestore', 'info', { 
+                    fields: Object.keys(saveData),
+                    studentName: saveData.student.name
+                });
 
+                logDebug('💾 Writing to Firestore...', 'info');
                 await setDoc(docRef, saveData, { merge: true });
+                
+                logDebug('✅ Firestore write successful!', 'success');
                 
                 // Store the student ID for future reference
                 localStorage.setItem('wisdom_current_student_id', studentId);
                 
                 setStatus(`✅ Data saved to Firestore for ${data.student.name}!`, 'success');
-                updateCloudStatus(true);
+                if (typeof window.updateCloudStatus === 'function') {
+                    window.updateCloudStatus(true);
+                }
                 
                 saveBtn.className = 'btn-cloud-save saved';
                 saveBtn.textContent = '✅ Saved to Cloud';
+                logDebug('🎉 Save operation completed successfully!', 'success');
                 
             } catch (error) {
-                console.error('Firestore save error:', error);
+                logDebug('❌ Firestore save error', 'error', { 
+                    message: error.message,
+                    code: error.code,
+                    stack: error.stack
+                });
+                
                 setStatus(`❌ Error saving to Firestore: ${error.message}`, 'error');
                 saveBtn.className = 'btn-cloud-save';
                 saveBtn.textContent = '💾 Save to Cloud';
-                updateCloudStatus(false);
+                if (typeof window.updateCloudStatus === 'function') {
+                    window.updateCloudStatus(false);
+                }
             } finally {
                 isSaving = false;
                 saveBtn.disabled = false;
+                logDebug('🔓 Save operation completed', 'info');
             }
         }
 
         // ==================== LOAD FROM FIRESTORE ====================
         async function loadFromFirestore(studentId = null) {
+            logDebug('📥 Load from Firestore initiated', 'info');
+            
             if (!currentUser) {
+                logDebug('❌ Load failed: User not logged in', 'error');
                 setStatus('⚠️ Please login to load from Firestore', 'error');
                 return;
             }
 
             if (!studentId) {
                 studentId = localStorage.getItem('wisdom_current_student_id');
+                logDebug(`📌 Using stored student ID: ${studentId || 'none'}`, 'info');
+                
                 if (!studentId) {
                     const name = prompt('Enter student name to load (e.g., SHEHU AMHEED MARVELOUS):');
-                    if (!name) return;
+                    if (!name) {
+                        logDebug('❌ Load cancelled: No name provided', 'warning');
+                        return;
+                    }
                     studentId = name.replace(/\s+/g, '_').toLowerCase();
+                    logDebug(`📌 Generated student ID: ${studentId}`, 'info');
                 }
             }
 
             try {
                 const docRef = doc(db, 'scoreSheets', studentId);
+                logDebug(`📄 Fetching document: scoreSheets/${studentId}`, 'info');
+                
                 const docSnap = await getDoc(docRef);
+                logDebug(`📄 Document exists: ${docSnap.exists()}`, 'info');
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
+                    logDebug('📦 Data retrieved from Firestore', 'success', { 
+                        student: data.student?.name,
+                        owner: data.ownerEmail,
+                        lastSaved: data.lastSaved
+                    });
+                    
                     // Remove metadata before loading
                     delete data.ownerId;
                     delete data.ownerEmail;
@@ -914,77 +1095,79 @@
                     // Re-render
                     if (typeof window.render === 'function') {
                         window.render();
+                        logDebug('✅ DOM re-rendered with loaded data', 'success');
                     }
                     
                     setStatus(`✅ Data loaded from Firestore for ${data.student.name}!`, 'success');
-                    updateCloudStatus(true);
+                    if (typeof window.updateCloudStatus === 'function') {
+                        window.updateCloudStatus(true);
+                    }
+                    logDebug('🎉 Load operation completed successfully!', 'success');
                 } else {
+                    logDebug(`📭 No document found for student ID: ${studentId}`, 'warning');
                     setStatus(`ℹ️ No data found in Firestore for this student.`, 'info');
                 }
             } catch (error) {
-                console.error('Firestore load error:', error);
+                logDebug('❌ Firestore load error', 'error', { 
+                    message: error.message,
+                    code: error.code,
+                    stack: error.stack
+                });
                 setStatus(`❌ Error loading from Firestore: ${error.message}`, 'error');
             }
         }
 
         // ==================== AUTH STATE ====================
+        logDebug('🔐 Setting up auth state listener...', 'info');
+        
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                updateAuthStatus(user);
+                logDebug('✅ User authenticated', 'success', { 
+                    email: user.email,
+                    uid: user.uid,
+                    emailVerified: user.emailVerified
+                });
+                
+                if (typeof window.updateAuthStatus === 'function') {
+                    window.updateAuthStatus(user);
+                }
                 setStatus(`✅ Logged in as: ${user.email}`, 'success');
                 
                 // Auto-load if we have a student ID
                 const studentId = localStorage.getItem('wisdom_current_student_id');
                 if (studentId) {
+                    logDebug(`🔄 Auto-loading data for: ${studentId}`, 'info');
                     setTimeout(() => loadFromFirestore(studentId), 1000);
+                } else {
+                    logDebug('ℹ️ No student ID found for auto-load', 'info');
                 }
             } else {
                 currentUser = null;
-                updateAuthStatus(null);
+                logDebug('🔓 User logged out', 'warning');
+                
+                if (typeof window.updateAuthStatus === 'function') {
+                    window.updateAuthStatus(null);
+                }
                 setStatus('🔓 Not logged in. Data saved locally only.', 'error');
             }
         });
 
         // ==================== SAVE BUTTON ====================
         const saveBtn = document.getElementById('saveBtn');
-        saveBtn.addEventListener('click', saveToFirestore);
+        saveBtn.addEventListener('click', () => {
+            logDebug('🖱️ Save button clicked', 'info');
+            saveToFirestore();
+        });
 
         // ==================== EXPOSE FUNCTIONS ====================
         window.saveToFirestore = saveToFirestore;
         window.loadFromFirestore = loadFromFirestore;
-        window.updateCloudStatus = function(synced) {
-            const cloudStatus = document.getElementById('cloudStatus');
-            const saveBtn = document.getElementById('saveBtn');
-            if (synced) {
-                cloudStatus.className = 'cloud-status synced';
-                cloudStatus.textContent = '☁️ Synced ✓';
-                saveBtn.className = 'btn-cloud-save saved';
-                saveBtn.textContent = '✅ Saved to Cloud';
-            } else {
-                cloudStatus.className = 'cloud-status unsynced';
-                cloudStatus.textContent = '☁️ Unsaved';
-                saveBtn.className = 'btn-cloud-save';
-                saveBtn.textContent = '💾 Save to Cloud';
-            }
-        };
-        window.updateAuthStatus = function(user) {
-            const authStatus = document.getElementById('authStatus');
-            const saveBtn = document.getElementById('saveBtn');
-            if (user) {
-                authStatus.className = 'login-badge logged-in';
-                authStatus.textContent = `🔐 ${user.email}`;
-                saveBtn.disabled = false;
-            } else {
-                authStatus.className = 'login-badge logged-out';
-                authStatus.textContent = '🔓 Not Logged In';
-                saveBtn.disabled = true;
-            }
-        };
 
-        console.log('✅ Firestore integration loaded!');
-        console.log('💡 Click "Save to Cloud" to sync to Firestore');
-        console.log('🔄 Auto-load enabled when logged in');
+        logDebug('✅ Firestore integration loaded successfully!', 'success');
+        logDebug('💡 Click "Save to Cloud" to sync to Firestore', 'info');
+        logDebug('🔄 Auto-load enabled when logged in', 'info');
+        logDebug('🐛 Open debug log to see detailed operations', 'info');
     </script>
 </body>
 </html>
