@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Broadsheet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.error {
+            display: block;
+            background: #fee;
+            color: #c0392b;
+            border: 1px solid #fcc;
+        }
+
+        .message.success {
+            display: block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .password-requirements {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .debug-container {
+            margin-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            padding-top: 15px;
+        }
+
+        .debug-toggle {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #555;
+            width: auto;
+            display: inline-block;
+        }
+
+        .debug-toggle:hover {
+            background: #e8e8e8;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .debug-log {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            display: none;
+        }
+
+        .debug-log.show {
+            display: block;
+        }
+
+        .debug-log .timestamp {
+            color: #858585;
+        }
+
+        .debug-log .info {
+            color: #4fc3f7;
+        }
+
+        .debug-log .success {
+            color: #81c784;
+        }
+
+        .debug-log .error {
+            color: #ef5350;
+        }
+
+        .debug-log .warning {
+            color: #ffd54f;
+        }
+
+        .debug-log .data {
+            color: #ce93d8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📝 Create Account</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="John Doe" required />
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="you@example.com" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Min 6 characters" required minlength="6" />
+                <div class="password-requirements">Password must be at least 6 characters</div>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="Re-enter password" required />
+            </div>
+            <button type="submit" id="registerBtn">Register</button>
+        </form>
+
+        <div id="message" class="message"></div>
+
+        <div class="links">
+            Already have an account? <a href="login.html">Login here</a>
+        </div>
+
+        <div class="debug-container">
+            <button class="debug-toggle" id="debugToggle">🔍 Show Debug Log</button>
+            <div class="debug-log" id="debugLog"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // ==================== FIREBASE IMPORTS ====================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword,
+            sendEmailVerification
+        } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+        // ==================== DEBUG LOGGER ====================
+        const debugLog = document.getElementById('debugLog');
+        const debugToggle = document.getElementById('debugToggle');
+        let debugEntries = [];
+
+        function logDebug(message, type = 'info', data = null) {
+            const timestamp = new Date().toISOString();
+            const entry = { timestamp, message, type, data };
+            debugEntries.push(entry);
+            
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="${type}">${message}</span>${data ? `\n<span class="data">📦 ${JSON.stringify(data, null, 2)}</span>` : ''}`;
+            debugLog.appendChild(logEntry);
+            debugLog.scrollTop = debugLog.scrollHeight;
+            console.log(`[DEBUG] ${message}`, data || '');
+        }
+
+        debugToggle.addEventListener('click', () => {
+            debugLog.classList.toggle('show');
+            debugToggle.textContent = debugLog.classList.contains('show') ? '🔒 Hide Debug Log' : '🔍 Show Debug Log';
+        });
+
+        // ==================== FIREBASE CONFIG ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMS9yCW7gGln1X4rMq33RHoYeFWBLM0-E",
+            authDomain: "broadsheet-492aa.firebaseapp.com",
+            projectId: "broadsheet-492aa",
+            storageBucket: "broadsheet-492aa.firebasestorage.app",
+            messagingSenderId: "631605688845",
+            appId: "1:631605688845:web:5ebfa528d7596f21033344",
+            measurementId: "G-5DSG36J39H"
+        };
+
+        // ==================== INITIALIZE FIREBASE ====================
+        logDebug('🚀 Initializing Firebase with Auth + Firestore...', 'info');
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            
+            logDebug('✅ Firebase initialized successfully!', 'success');
+            logDebug(`📁 Project: ${firebaseConfig.projectId}`, 'info');
+            logDebug('🔐 Firebase Auth enabled', 'success');
+            logDebug('📚 Firestore enabled', 'success');
+            
+            window.auth = auth;
+            window.db = db;
+        } catch (error) {
+            logDebug(`❌ Firebase initialization failed: ${error.message}`, 'error', error);
+            showMessage('Failed to initialize Firebase. Check debug log.', 'error');
+        }
+
+        // ==================== DOM ELEMENTS ====================
+        const registerForm = document.getElementById('registerForm');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const registerBtn = document.getElementById('registerBtn');
+        const messageDiv = document.getElementById('message');
+
+        logDebug('📋 DOM elements loaded', 'info');
+
+        function showMessage(text, type = 'error') {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            logDebug(`📢 Message: ${text} (${type})`, type);
+        }
+
+        // ==================== REGISTRATION HANDLER ====================
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            logDebug('📝 Registration started', 'info');
+
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            const confirmPassword = confirmPasswordInput.value.trim();
+
+            logDebug(`📊 Data: Name="${name}", Email="${email}"`, 'info');
+
+            // ==================== VALIDATIONS ====================
+            if (!name || !email || !password || !confirmPassword) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error');
+                return;
+            }
+
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Creating Account...';
+            messageDiv.className = 'message';
+
+            try {
+                const auth = window.auth;
+                const db = window.db;
+
+                if (!auth || !db) {
+                    throw new Error('Firebase not initialized');
+                }
+
+                // ==================== CREATE USER WITH FIREBASE AUTH ====================
+                logDebug('🔐 Creating user with Firebase Auth...', 'info');
+                
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                logDebug(`✅ User created successfully! UID: ${user.uid}`, 'success', { uid: user.uid, email: user.email });
+
+                // ==================== SEND EMAIL VERIFICATION ====================
+                try {
+                    await sendEmailVerification(user);
+                    logDebug('📧 Verification email sent', 'success');
+                } catch (error) {
+                    logDebug(`⚠️ Could not send verification email: ${error.message}`, 'warning');
+                }
+
+                // ==================== SAVE USER DATA TO FIRESTORE ====================
+                logDebug('💾 Saving user data to Firestore...', 'info');
+                
+                const userData = {
+                    uid: user.uid,
+                    name: name,
+                    email: email,
+                    createdAt: serverTimestamp(),
+                    emailVerified: false,
+                    role: 'user'
+                };
+
+                await setDoc(doc(db, 'users', user.uid), userData);
+                logDebug('✅ User data saved to Firestore', 'success', userData);
+
+                // ==================== SUCCESS ====================
+                showMessage('✅ Account created successfully! Redirecting to login...', 'success');
+                logDebug('🎉 Registration completed successfully!', 'success');
+
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+
+            } catch (error) {
+                // ==================== ERROR HANDLING ====================
+                logDebug(`❌ Registration error: ${error.message}`, 'error', error);
+                
+                // Common Firebase Auth errors
+                let errorMessage = 'An error occurred. Please try again.';
+                
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = '❌ This email is already registered. Please login.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = '❌ Invalid email address.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = '❌ Password is too weak. Use at least 6 characters.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = '❌ Too many attempts. Please try again later.';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage = '❌ Network error. Check your internet connection.';
+                        break;
+                    default:
+                        errorMessage = `❌ ${error.message}`;
+                }
+                
+                showMessage(errorMessage, 'error');
+
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                logDebug('🔓 Button re-enabled', 'info');
+            }
+        });
+
+        // ==================== KEYBOARD SHORTCUT ====================
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'd') {
+                e.preventDefault();
+                debugToggle.click();
+            }
+        });
+
+        logDebug('✅ Register page ready!', 'success');
+        logDebug('💡 Press Ctrl+D to toggle debug log', 'info');
+    </script>
+</body>
+</html>
