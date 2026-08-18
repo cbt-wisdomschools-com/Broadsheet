@@ -3,1471 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Score Sheet · Wisdom Foundation</title>
+    <title>Dashboard · Wisdom Foundation</title>
     <style>
-        :root {
-            --bg-color: #f7efe0;
-            --text-color: #1f1c18;
-            --table-border: #b87c44;
-            --th-bg: #7a3f0e;
-            --th-color: #fcf3e4;
-            --report-box-border: #b87c44;
-            --button-bg: #b55a1a;
-            --button-color: white;
-            --low-score-color: #b22222;
-            --watermark-opacity: 0.12;
-            --input-bg: #fffcf5;
-        }
-        body.dark-theme {
-            --bg-color: #1e1a16;
-            --text-color: #e8e0d6;
-            --table-border: #8b6b44;
-            --th-bg: #4d2c0e;
-            --th-color: #e8dcc8;
-            --report-box-border: #8b6b44;
-            --button-bg: #6d3f12;
-            --button-color: #e8dcc8;
-            --low-score-color: #e6735c;
-            --watermark-opacity: 0.08;
-            --input-bg: #2a241e;
-        }
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Segoe UI', 'Arial', sans-serif;
-            margin: 20px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s;
-            position: relative;
-            z-index: 1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        body::before {
-            content: "";
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 70vw;
-            height: 70vh;
-            background: url('img/logo.png') no-repeat center center;
-            background-size: contain;
-            opacity: var(--watermark-opacity);
-            pointer-events: none;
-            z-index: 0;
-            transition: opacity 0.3s;
+        .container {
+            background: white;
+            padding: 50px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         .logo {
-            text-align: center;
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 2;
+            margin-bottom: 20px;
         }
         .logo img {
-            height: 90px;
+            height: 80px;
+            border-radius: 16px;
             border: 3px solid #b87c44;
-            border-radius: 20px;
             padding: 6px;
             background: #fffbf0;
         }
-        .logo h5, .logo h2, .logo h3 {
-            margin: 4px 0;
-            color: var(--text-color);
-        }
-        .report-box {
-            border: 2px solid var(--report-box-border);
-            padding: 12px 15px;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            background: var(--bg-color);
-            transition: border-color 0.3s, background 0.3s;
-            position: relative;
-            z-index: 2;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 9px;
-            margin-bottom: 8px;
-            background: var(--bg-color);
-        }
-        th, td {
-            border: 1px solid var(--table-border);
-            padding: 3px 2px;
-            text-align: center;
-            transition: border-color 0.3s;
-        }
-        th {
-            background: var(--th-bg);
-            color: var(--th-color);
-            font-weight: 700;
-        }
-        input[type="text"], input[type="number"], input[type="email"], input[type="password"] {
-            width: 100%;
-            border: none;
-            background: var(--input-bg);
-            text-align: center;
-            font-size: 8.5px;
-            padding: 3px 1px;
-            outline: none;
-            border-radius: 3px;
-            color: var(--text-color);
-            transition: 0.15s;
-            font-weight: 500;
-        }
-        input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="password"]:focus {
-            box-shadow: inset 0 0 0 2px #b87c44;
-            background: #f5ede0;
-        }
-        body.dark-theme input[type="text"]:focus,
-        body.dark-theme input[type="number"]:focus,
-        body.dark-theme input[type="email"]:focus,
-        body.dark-theme input[type="password"]:focus {
-            background: #3a322a;
-            box-shadow: inset 0 0 0 2px #b87c44;
-        }
-        input[readonly] {
-            background: #e8dfd2;
-            font-weight: 600;
-            color: #2d2a24;
-            cursor: default;
-        }
-        body.dark-theme input[readonly] {
-            background: #3a322a;
-            color: #e0d8cc;
-        }
-        .side-by-side {
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .table-small { flex: 1 1 45%; min-width: 200px; }
-        .btn-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 12px;
-            position: relative;
-            z-index: 2;
-        }
-        .btn-group button {
-            color: var(--button-color);
-            background-color: var(--button-bg);
-            border: 2px solid #7d3c0c;
-            padding: 8px 22px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 3px 3px 0 #5f2e0a;
-            transition: 0.1s;
-        }
-        .btn-group button:hover {
-            transform: translate(2px, 2px);
-            box-shadow: 1px 1px 0 #5f2e0a;
-        }
-        .btn-group button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: 2px 2px 0 #5f2e0a;
-        }
-        .btn-group .btn-success { background: #2b6e4e; border-color: #1f5a3e; box-shadow: 3px 3px 0 #1a452f; }
-        .btn-group .btn-success:hover { background: #35835d; }
-        .btn-group .btn-warning { background: #b6692a; border-color: #9a5621; box-shadow: 3px 3px 0 #7a4419; }
-        .btn-group .btn-warning:hover { background: #cd7d36; }
-        .btn-group .btn-primary { background: #1e2f3f; border-color: #1a2937; box-shadow: 3px 3px 0 #0f1a24; }
-        .btn-group .btn-primary:hover { background: #2c4055; }
-        .btn-group .btn-danger { background: #8b1a1a; border-color: #5f0f0f; box-shadow: 3px 3px 0 #3d0a0a; }
-        .btn-group .btn-danger:hover { background: #a82222; }
-        .btn-group .btn-cloud-save { 
-            background: #2b6e4e; 
-            border-color: #1f5a3e; 
-            box-shadow: 3px 3px 0 #1a452f;
-            font-size: 1.1rem;
-            padding: 10px 30px;
-        }
-        .btn-group .btn-cloud-save:hover { background: #35835d; }
-        .btn-group .btn-cloud-save:disabled { opacity: 0.5; }
-        .btn-group .btn-cloud-save.saving {
-            background: #f39c12;
-            border-color: #d68910;
-        }
-        .btn-group .btn-cloud-save.saved {
-            background: #27ae60;
-            border-color: #1e8449;
-        }
-        .btn-group .btn-json { background: #1e2f3f; border-color: #1a2937; box-shadow: 3px 3px 0 #0f1a24; }
-        .btn-group .btn-json:hover { background: #2c4055; }
-        .btn-group .btn-debug { 
-            background: #6c3483; 
-            border-color: #4a235a; 
-            box-shadow: 3px 3px 0 #2c1a3a;
-            font-size: 0.8rem;
-            padding: 6px 16px;
-        }
-        .btn-group .btn-debug:hover { background: #7d3c98; }
-        .btn-group .btn-logout {
-            background: #c0392b;
-            border-color: #922b21;
-            box-shadow: 3px 3px 0 #6c1f1a;
-            font-size: 0.9rem;
-            padding: 8px 22px;
-        }
-        .btn-group .btn-logout:hover { background: #e74c3c; }
-        .btn-group .btn-login {
-            background: #2980b9;
-            border-color: #1f618d;
-            box-shadow: 3px 3px 0 #154360;
-            font-size: 0.9rem;
-            padding: 8px 22px;
-        }
-        .btn-group .btn-login:hover { background: #3498db; }
-        .theme-toggle {
-            position: fixed;
-            top: 12px;
-            right: 12px;
-            background: var(--th-bg);
-            color: var(--th-color);
-            border: 2px solid var(--table-border);
-            padding: 6px 16px;
-            border-radius: 40px;
-            cursor: pointer;
-            z-index: 1000;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: 0.2s;
-        }
-        .theme-toggle:hover { transform: scale(1.03); }
-        .rating-key-table { width: 100%; margin-top: 6px; font-size: 8px; }
-        .rating-key-table th { background-color: #dbbd9a; color: #2d1a08; }
-        .unified-rating-key {
-            margin-top: 10px;
-            border-top: 3px double #b87c44;
-            padding-top: 8px;
-        }
-        .low-score { color: var(--low-score-color); font-weight: 700; }
-        .score-table th:nth-child(1) { width: 14%; }
-        .score-table th:nth-child(2) { width: 5%; }
-        .score-table th:nth-child(3) { width: 5%; }
-        .score-table th:nth-child(4) { width: 5%; }
-        .score-table th:nth-child(5) { width: 5%; }
-        .score-table th:nth-child(6) { width: 5%; }
-        .score-table th:nth-child(7) { width: 5%; }
-        .score-table th:nth-child(8) { width: 7%; }
-        .score-table th:nth-child(9) { width: 7%; }
-        .score-table th:nth-child(10) { width: 7%; }
-        .score-table th:nth-child(11) { width: 7%; }
-        .score-table th:nth-child(12) { width: 7%; }
-        .score-table th:nth-child(13) { width: 6%; }
-        .score-table th:nth-child(14) { width: 6%; }
-        .score-table th:nth-child(15) { width: 7%; }
-        .status-bar {
-            font-size: 0.75rem;
-            color: #6f6456;
-            text-align: right;
-            margin-top: 4px;
-            padding: 4px 10px;
-            border-radius: 4px;
-            transition: 0.3s;
-        }
-        .status-bar.success { color: #2e7d32; background: #e8f5e9; }
-        .status-bar.error { color: #c0392b; background: #fee; }
-        .status-bar.info { color: #1565c0; background: #e3f2fd; }
-        .status-bar.saving { color: #e65100; background: #fff3e0; animation: pulse 1s infinite; }
-        .status-bar.debug { color: #6c3483; background: #f4ecf7; font-family: monospace; font-size: 0.7rem; }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-        .login-badge {
-            display: inline-block;
-            padding: 2px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-left: 10px;
-        }
-        .login-badge.logged-in { background: #e8f5e9; color: #2e7d32; }
-        .login-badge.logged-out { background: #fee; color: #c0392b; }
-        .cloud-status {
-            font-size: 11px;
-            margin-left: 8px;
-        }
-        .cloud-status.synced { color: #2e7d32; }
-        .cloud-status.unsynced { color: #e65100; }
-        .cloud-status.saving { color: #f39c12; }
-        .debug-container {
-            margin-top: 15px;
-            border-top: 2px solid #b87c44;
-            padding-top: 10px;
-            position: relative;
-            z-index: 2;
-        }
-        .debug-toggle {
-            background: #6c3483;
-            color: white;
-            border: 2px solid #4a235a;
-            padding: 5px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 600;
-            transition: 0.2s;
-            margin-bottom: 8px;
-        }
-        .debug-toggle:hover { background: #7d3c98; }
-        .debug-log {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 12px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            display: none;
-            border: 2px solid #6c3483;
-        }
-        .debug-log.show { display: block; }
-        .debug-log .timestamp { color: #858585; }
-        .debug-log .success { color: #81c784; }
-        .debug-log .error { color: #ef5350; }
-        .debug-log .info { color: #4fc3f7; }
-        .debug-log .warning { color: #ffd54f; }
-        .debug-log .data { color: #ce93d8; }
-        .debug-log .firebase { color: #ffab40; }
-        
-        /* Login Modal */
-        .login-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 9999;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
-        .login-overlay.show { display: flex; }
-        .login-modal {
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 400px;
-            animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        body.dark-theme .login-modal {
-            background: #2a241e;
-            color: #e8e0d6;
-        }
-        .login-modal h2 {
-            text-align: center;
-            margin-bottom: 20px;
+        h1 {
             color: #333;
+            margin-bottom: 8px;
         }
-        body.dark-theme .login-modal h2 { color: #e8e0d6; }
-        .login-modal .form-group {
-            margin-bottom: 15px;
-        }
-        .login-modal .form-group label {
-            display: block;
-            font-weight: 600;
+        .subtitle {
+            color: #888;
             font-size: 14px;
-            margin-bottom: 4px;
-            color: #555;
+            margin-bottom: 25px;
         }
-        body.dark-theme .login-modal .form-group label { color: #ccc; }
-        .login-modal .form-group input {
-            width: 100%;
-            padding: 10px 14px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            background: white;
-            color: #333;
+        .user-info {
+            background: #f8f8f8;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
             text-align: left;
         }
-        body.dark-theme .login-modal .form-group input {
-            background: #3a322a;
-            color: #e8e0d6;
-            border-color: #555;
+        .user-info .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
         }
-        .login-modal .form-group input:focus {
-            border-color: #667eea;
-            outline: none;
+        .user-info .row:last-child {
+            border-bottom: none;
         }
-        .login-modal .login-error {
-            color: #c0392b;
-            font-size: 13px;
-            text-align: center;
-            margin: 10px 0;
-            display: none;
+        .user-info .label {
+            color: #888;
+            font-weight: 500;
         }
-        .login-modal .login-error.show { display: block; }
-        .login-modal .btn-login-submit {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .user-info .value {
+            color: #333;
+            font-weight: 600;
+            font-family: monospace;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .btn-group button {
+            flex: 1;
+            padding: 12px 24px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .login-modal .btn-login-submit:hover { transform: scale(1.02); opacity: 0.9; }
-        .login-modal .btn-login-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-        .login-modal .login-hint {
-            text-align: center;
+        .btn-group button:hover {
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        .btn-danger:hover {
+            box-shadow: 0 6px 25px rgba(231, 76, 60, 0.4);
+        }
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+        .btn-success:hover {
+            box-shadow: 0 6px 25px rgba(46, 204, 113, 0.4);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
             font-size: 12px;
-            color: #888;
-            margin-top: 12px;
-            padding: 10px;
-            background: #f5f5f5;
-            border-radius: 6px;
+            font-weight: 600;
+            background: #e8f5e9;
+            color: #2e7d32;
         }
-        body.dark-theme .login-modal .login-hint {
-            background: #3a322a;
-            color: #aaa;
-        }
-        .login-modal .login-hint strong { color: #667eea; }
-        
-        @media print {
-            body { font-size: 7px; margin: 4px; background: white; color: black; }
-            body::before { opacity: 0.06; width: 50vw; height: 50vh; }
-            .theme-toggle, .btn-group, .debug-container, .login-overlay { display: none; }
-            .report-box { border: 1px solid #7d4a1a; background: white; }
-            th { background: #7d4a1a; color: white; }
-            input { border: none; background: transparent; }
-            .low-score { color: #b22222; }
-        }
-        @media (max-width: 700px) {
-            .side-by-side { flex-direction: column; }
-            .table-small { flex: 1 1 100%; }
-            body::before { width: 85vw; height: 85vh; }
-            .login-modal { margin: 20px; padding: 30px; }
+        @media (max-width: 480px) {
+            .container { padding: 30px 20px; }
+            .btn-group { flex-direction: column; }
+            .user-info .row { flex-direction: column; padding: 6px 0; }
+            .user-info .value { margin-top: 2px; }
         }
     </style>
 </head>
 <body>
-    <button class="theme-toggle" id="themeToggle">🌙 Dark Mode</button>
-
-    <div class="logo">
-        <img src="img/logo.png" alt="School Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27200%27 height=%2760%27 viewBox=%270 0 200 60%27%3E%3Crect width=%27200%27 height=%2760%27 fill=%27%23b87c44%27/%3E%3Ctext x=%2720%27 y=%2740%27 font-family=%27Impact%27 font-size=%2728%27 fill=%27%23fcf3e4%27%3EWISDOM%3C/text%3E%3Ctext x=%27120%27 y=%2740%27 font-family=%27Impact%27 font-size=%2728%27 fill=%27%23f5d6b0%27%3EFOUNDATION%3C/text%3E%3C/svg%3E'">
-        <h5>TERMINAL PROGRESS REPORT FOR SECONDARY SCHOOLS</h5>
-        <img id="student-image" src="img/wfs501.png" alt="Profile" style="width:70px; height:70px; border-radius:50%; border:3px solid #b87c44; object-fit:cover;">
-        <h2 id="welcomeName">Student: SHEHU AMHEED MARVELOUS</h2>
-        <h3 id="reportHeader">2026 / 2027 · FIRST TERM REPORT SHEET</h3>
-        <div style="margin-top:6px;">
-            <span id="authStatus" class="login-badge logged-out">🔓 Not Logged In</span>
-            <span id="cloudStatus" class="cloud-status unsynced">☁️ Unsaved</span>
-        </div>
-    </div>
-
-    <div class="report-box">
-        <h2 style="color:var(--text-color);">📋 SCORE SHEET — ALL DATA EDITABLE</h2>
-
-        <div class="side-by-side" id="bioDataContainer"></div>
-        <hr style="border-color:#b87c44;">
-
-        <div class="report-box">
-            <h3 style="color:var(--text-color);">Academic Scores (edit all fields)</h3>
-            <table class="score-table" id="subjectScores">
-                <thead>
-                    <tr>
-                        <th>SUBJECTS</th><th>TEST1</th><th>TEST2</th><th>TEST3</th>
-                        <th>ASS1</th><th>ASS2</th><th>ASS3</th>
-                        <th>CASUM</th><th>EXAM</th><th>TOTAL</th>
-                        <th>CUMM b/f</th><th>CUMM SCORE</th>
-                        <th>AVG</th><th>POS</th><th>GRADE</th>
-                    </tr>
-                </thead>
-                <tbody id="scoresBody"></tbody>
-            </table>
+    <div class="container">
+        <div class="logo">
+            <img src="img/logo.png" alt="Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27200%27 height=%2780%27%3E%3Crect width=%27200%27 height=%2780%27 fill=%27%23b87c44%27/%3E%3Ctext x=%2730%27 y=%2750%27 font-size=%2730%27 fill=%27white%27 font-weight=%27bold%27%3EWISDOM%3C/text%3E%3C/svg%3E'">
         </div>
 
-        <h6 style="color:var(--text-color);">Grading: 75+ A (Excellent) · 65-74 B (Good) · 50-64 C (Average) · 40-49 D (Fair) · 0-39 F (Poor)</h6>
-        <hr style="border-color:#b87c44;">
+        <div class="avatar">👤</div>
 
-        <div class="side-by-side" id="skillsContainer"></div>
+        <h1>Welcome, Admin!</h1>
+        <p class="subtitle">You are logged in to the Wisdom Foundation Dashboard</p>
 
-        <div class="unified-rating-key">
-            <h3 style="color:var(--text-color);">Rating Key</h3>
-            <table class="rating-key-table">
-                <tr><th>Rating</th><th>Description</th></tr>
-                <tr><td>5</td><td>Excellent</td></tr>
-                <tr><td>4</td><td>Very Good</td></tr>
-                <tr><td>3</td><td>Good</td></tr>
-                <tr><td>2</td><td>Fair</td></tr>
-                <tr><td>1</td><td>Poor</td></tr>
-            </table>
-        </div>
-        <hr style="border-color:#b87c44;">
-
-        <h3 style="color:var(--text-color);">Remarks</h3>
-        <table id="remarksTable">
-            <tr><th>Category</th><th>Remarks</th><th>Signature/Date</th></tr>
-            <tbody id="remarksBody"></tbody>
-        </table>
-    </div>
-
-    <div class="btn-group">
-        <button class="btn-cloud-save" id="saveBtn" disabled>💾 Save to Cloud</button>
-        <button class="btn-json" id="exportJsonBtn">📥 Export JSON</button>
-        <button class="btn-login" id="loginBtn">🔐 Login</button>
-        <button class="btn-logout" id="logoutBtn" style="display:none;">🚪 Logout</button>
-        <button class="btn-debug" id="debugToggleBtn">🐛 Toggle Debug</button>
-    </div>
-    <div class="status-bar" id="statusMsg">Ready · Please login to save to cloud</div>
-
-    <!-- ==================== LOGIN MODAL ==================== -->
-    <div class="login-overlay" id="loginOverlay">
-        <div class="login-modal">
-            <h2>🔐 Login</h2>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="loginEmail" placeholder="Enter your email" value="wisdom_admin@gmail.com">
+        <div class="user-info">
+            <div class="row">
+                <span class="label">📧 Email</span>
+                <span class="value" id="userEmail">wisdom_admin@gmail.com</span>
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="loginPassword" placeholder="Enter your password" value="admin_123">
+            <div class="row">
+                <span class="label">👤 Role</span>
+                <span class="value" id="userRole">Administrator</span>
             </div>
-            <div class="login-error" id="loginError">Invalid email or password. Please try again.</div>
-            <button class="btn-login-submit" id="loginSubmitBtn">Login</button>
-            <div class="login-hint">
-                <strong>Demo Credentials:</strong><br>
-                Email: <strong>wisdom_admin@gmail.com</strong><br>
-                Password: <strong>admin_123</strong>
+            <div class="row">
+                <span class="label">🔐 Status</span>
+                <span class="value"><span class="status-badge">✅ Authenticated</span></span>
+            </div>
+            <div class="row">
+                <span class="label">⏰ Login Time</span>
+                <span class="value" id="loginTime">Just now</span>
             </div>
         </div>
+
+        <div class="btn-group">
+            <button class="btn-primary" id="goToScoreSheetBtn">📊 Go to Score Sheet</button>
+            <button class="btn-danger" id="logoutBtn">🚪 Logout</button>
+        </div>
     </div>
 
-    <!-- ==================== DEBUG LOG ==================== -->
-    <div class="debug-container">
-        <div class="debug-log" id="debugLog"></div>
-    </div>
-
-    <!-- ==================== MAIN SCRIPT ==================== -->
     <script>
-        // ======================== DEBUG LOGGER ========================
-        const debugLog = document.getElementById('debugLog');
-        let debugVisible = false;
-
-        function logDebug(message, type = 'info', data = null) {
-            const timestamp = new Date().toISOString();
-            const entry = document.createElement('div');
-            const dataStr = data ? `\n📦 ${typeof data === 'object' ? JSON.stringify(data, null, 2) : data}` : '';
-            entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="${type}">${message}</span>${dataStr}`;
-            debugLog.appendChild(entry);
-            debugLog.scrollTop = debugLog.scrollHeight;
-            console.log(`[DEBUG] ${message}`, data || '');
-            
-            const statusMsg = document.getElementById('statusMsg');
-            if (type === 'error') {
-                statusMsg.textContent = `❌ ${message}`;
-                statusMsg.className = 'status-bar error';
-            }
-        }
-
-        document.getElementById('debugToggleBtn').addEventListener('click', () => {
-            debugVisible = !debugVisible;
-            debugLog.classList.toggle('show');
-            document.getElementById('debugToggleBtn').textContent = debugVisible ? '🐛 Hide Debug' : '🐛 Toggle Debug';
-            logDebug('🔍 Debug log ' + (debugVisible ? 'opened' : 'closed'), 'info');
-        });
-
-        // ======================== AUTH SYSTEM ========================
         const ADMIN_EMAIL = 'wisdom_admin@gmail.com';
-        const ADMIN_PASSWORD = 'admin_123';
         const AUTH_STORAGE_KEY = 'wisdom_auth_user';
 
-        let currentAuthUser = null;
-
-        function getStoredUser() {
-            const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-            if (stored) {
-                try {
-                    return JSON.parse(stored);
-                } catch(e) { return null; }
-            }
-            return null;
-        }
-
-        function storeUser(user) {
-            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-        }
-
-        function clearUser() {
-            localStorage.removeItem(AUTH_STORAGE_KEY);
-            localStorage.removeItem('wisdom_current_student_id');
-        }
-
-        function isAuthenticated() {
-            const user = getStoredUser();
-            return user && user.email === ADMIN_EMAIL;
-        }
-
-        // ======================== AUTH UI FUNCTIONS ========================
-        function updateAuthUI(user) {
-            const authStatus = document.getElementById('authStatus');
-            const loginBtn = document.getElementById('loginBtn');
-            const logoutBtn = document.getElementById('logoutBtn');
-            const saveBtn = document.getElementById('saveBtn');
-
-            if (user) {
-                authStatus.className = 'login-badge logged-in';
-                authStatus.textContent = `🔐 ${user.email}`;
-                loginBtn.style.display = 'none';
-                logoutBtn.style.display = 'inline-block';
-                saveBtn.disabled = false;
-                logDebug(`✅ User authenticated: ${user.email}`, 'success');
-            } else {
-                authStatus.className = 'login-badge logged-out';
-                authStatus.textContent = '🔓 Not Logged In';
-                loginBtn.style.display = 'inline-block';
-                logoutBtn.style.display = 'none';
-                saveBtn.disabled = true;
-                saveBtn.title = 'Please login to save to cloud';
-                logDebug('🔓 User not authenticated', 'warning');
-                
-                // Reset cloud status
-                const cloudStatus = document.getElementById('cloudStatus');
-                cloudStatus.className = 'cloud-status unsynced';
-                cloudStatus.textContent = '☁️ Unsaved';
-                saveBtn.className = 'btn-cloud-save';
-                saveBtn.textContent = '💾 Save to Cloud';
-            }
-            
-            // Update window reference for Firestore module
-            window.currentAuthUser = user;
-        }
-
-        // ======================== LOGIN ========================
-        function login(email, password) {
-            logDebug(`🔐 Login attempt: ${email}`, 'info');
-            
-            const loginError = document.getElementById('loginError');
-            loginError.className = 'login-error';
-            
-            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-                const user = { email: email, role: 'admin' };
-                storeUser(user);
-                currentAuthUser = user;
-                updateAuthUI(user);
-                
-                document.getElementById('loginOverlay').classList.remove('show');
-                setStatus(`✅ Logged in as: ${email}`, 'success');
-                logDebug('✅ Login successful', 'success', { email: email });
-                
-                // Trigger Firestore auth state change manually
-                if (typeof window.onAuthStateChangedCallback === 'function') {
-                    window.onAuthStateChangedCallback(user);
-                }
-                
-                // Auto-load data
-                const studentId = localStorage.getItem('wisdom_current_student_id');
-                if (studentId && typeof window.loadFromFirestore === 'function') {
-                    setTimeout(() => window.loadFromFirestore(studentId), 500);
-                }
-                
-                return true;
-            } else {
-                loginError.textContent = '❌ Invalid email or password. Please try again.';
-                loginError.className = 'login-error show';
-                logDebug('❌ Login failed: Invalid credentials', 'error', { email: email });
-                return false;
-            }
-        }
-
-        // ======================== LOGOUT ========================
-        function logout() {
-            logDebug('🚪 Logging out...', 'info');
-            clearUser();
-            currentAuthUser = null;
-            updateAuthUI(null);
-            
-            // Reset data to default
-            if (typeof window.resetToDefault === 'function') {
-                window.resetToDefault();
-            } else {
-                // Simple reset
-                currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
-                localStorage.setItem('wisdom_score_sheet_data', JSON.stringify(currentData));
-                render();
-            }
-            
-            setStatus('🔓 Logged out. Data reset to default.', 'info');
-            logDebug('✅ Logout successful', 'success');
-            
-            // Notify Firestore module
-            if (typeof window.onAuthStateChangedCallback === 'function') {
-                window.onAuthStateChangedCallback(null);
-            }
-        }
-
-        // ======================== DEFAULT DATA ========================
-        const DEFAULT_DATA = {
-            student: {
-                name: "SHEHU AMHEED MARVELOUS",
-                class: "JUNIOR",
-                term: "FIRST",
-                session: "2026/2027",
-                house: "Red",
-                attendance: 42,
-                outOf: 45,
-                numberInClass: 28,
-                image: "img/wfs101.png"
-            },
-            subjects: [
-                { name: "ENGLISH LANGUAGE.", test1: 34, test2: 40, test3: 58, ass1: 10, ass2: 12, ass3: 11, casum: 165, exam: 41, total: 103, cummBf: 70, cummScore: 86, avg: 72, pos: "3rd", grade: "A" },
-                { name: "MATHEMATICS", test1: 50, test2: 60, test3: 65, ass1: 15, ass2: 18, ass3: 20, casum: 228, exam: 55, total: 141, cummBf: 65, cummScore: 103, avg: 68, pos: "2nd", grade: "A" },
-                { name: "DIGITAL TECHNOLOGY", test1: 60, test2: 70, test3: 100, ass1: 20, ass2: 22, ass3: 25, casum: 297, exam: 72, total: 184, cummBf: 80, cummScore: 132, avg: 74, pos: "1st", grade: "A" },
-                { name: "CITIZENSHIP & HERITAGE", test1: 50, test2: 60, test3: 50, ass1: 12, ass2: 14, ass3: 16, casum: 202, exam: 58, total: 121, cummBf: 60, cummScore: 90, avg: 62, pos: "5th", grade: "B" },
-                { name: "CRK", test1: 70, test2: 62, test3: 50, ass1: 18, ass2: 15, ass3: 20, casum: 235, exam: 58, total: 148, cummBf: 68, cummScore: 108, avg: 65, pos: "4th", grade: "B" },
-                { name: "HISTORY", test1: 50, test2: 56, test3: 40, ass1: 10, ass2: 12, ass3: 14, casum: 182, exam: 53, total: 96, cummBf: 55, cummScore: 75, avg: 58, pos: "6th", grade: "C" },
-                { name: "YORUBA", test1: 80, test2: 45, test3: 55, ass1: 8, ass2: 10, ass3: 12, casum: 210, exam: 45, total: 116, cummBf: 62, cummScore: 89, avg: 60, pos: "7th", grade: "C" },
-                { name: "PHE", test1: 50, test2: 56, test3: 40, ass1: 15, ass2: 18, ass3: 20, casum: 199, exam: 53, total: 118, cummBf: 58, cummScore: 88, avg: 61, pos: "8th", grade: "C" },
-                { name: "FRENCH", test1: 50, test2: 56, test3: 40, ass1: 6, ass2: 8, ass3: 10, casum: 170, exam: 53, total: 88, cummBf: 50, cummScore: 69, avg: 55, pos: "9th", grade: "D" },
-                { name: "SOCIAL STUDIES", test1: 50, test2: 56, test3: 40, ass1: 12, ass2: 14, ass3: 16, casum: 188, exam: 53, total: 100, cummBf: 54, cummScore: 77, avg: 56, pos: "10th", grade: "D" },
-                { name: "BUSINESS STUDIES", test1: 50, test2: 56, test3: 40, ass1: 9, ass2: 11, ass3: 13, casum: 179, exam: 53, total: 95, cummBf: 52, cummScore: 73, avg: 54, pos: "11th", grade: "D" },
-                { name: "BASIC SCIENCE", test1: 50, test2: 56, test3: 40, ass1: 14, ass2: 16, ass3: 18, casum: 194, exam: 53, total: 101, cummBf: 56, cummScore: 78, avg: 57, pos: "12th", grade: "D" },
-                { name: "CCA", test1: "-", test2: "-", test3: "-", ass1: "-", ass2: "-", ass3: "-", casum: "-", exam: "-", total: "-", cummBf: "-", cummScore: "-", avg: "-", pos: "-", grade: "-" }
-            ],
-            characterDevelopment: [
-                { trait: "Punctuality", rating: 4 },
-                { trait: "Attentiveness", rating: 5 },
-                { trait: "Neatness", rating: 3 },
-                { trait: "Honesty", rating: 4 },
-                { trait: "Relationship", rating: 4 }
-            ],
-            practicalSkills: [
-                { skill: "Sport", rating: 3 },
-                { skill: "Club", rating: 4 },
-                { skill: "Fluency", rating: 5 },
-                { skill: "Handwriting", rating: 4 }
-            ],
-            remarks: [
-                { category: "Teacher Remark", text: "Shows great improvement, keep it up." },
-                { category: "House masters Remark", text: "Well behaved and respectful." },
-                { category: "Principal Remark", text: "Good academic standing, encouraged to do more." },
-                { category: "Next Term", text: "January 15 2027" },
-                { category: "Promoted To", text: "-----" }
-            ]
-        };
-
-        // ======================== STATE ========================
-        let currentData = null;
-        let currentStudentId = null;
-        let isCloudSynced = false;
-        const STORAGE_KEY = 'wisdom_score_sheet_data';
-        const STUDENT_ID_KEY = 'wisdom_current_student_id';
-
-        // ======================== DOM REFS ========================
-        const statusMsg = document.getElementById('statusMsg');
-        const saveBtn = document.getElementById('saveBtn');
-        const exportJsonBtn = document.getElementById('exportJsonBtn');
-        const authStatus = document.getElementById('authStatus');
-        const cloudStatus = document.getElementById('cloudStatus');
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const loginOverlay = document.getElementById('loginOverlay');
-        const loginEmail = document.getElementById('loginEmail');
-        const loginPassword = document.getElementById('loginPassword');
-        const loginSubmitBtn = document.getElementById('loginSubmitBtn');
-        const loginError = document.getElementById('loginError');
-
-        // ======================== LOAD / SAVE ========================
-        function loadData() {
-            logDebug('📂 Loading data from localStorage...', 'info');
-            const stored = localStorage.getItem(STORAGE_KEY);
-            const savedId = localStorage.getItem(STUDENT_ID_KEY);
-            
-            if (stored) {
-                try {
-                    const parsed = JSON.parse(stored);
-                    currentData = deepMerge(DEFAULT_DATA, parsed);
-                    logDebug('✅ Data loaded from localStorage', 'success', { name: currentData.student.name });
-                } catch(e) { 
-                    currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
-                    logDebug('⚠️ Error parsing stored data, using defaults', 'warning', e.message);
-                }
-            } else {
-                currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
-                logDebug('📄 No stored data found, using defaults', 'info');
-            }
-            
-            if (savedId) {
-                currentStudentId = savedId;
-                logDebug(`📌 Student ID: ${savedId}`, 'info');
-            }
-            return currentData;
-        }
-
-        function saveData() {
-            collectFromDOM();
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
-            if (currentStudentId) {
-                localStorage.setItem(STUDENT_ID_KEY, currentStudentId);
-            }
-            updateCloudStatus(false);
-            setStatus('💾 Data saved locally', 'info');
-            logDebug('💾 Data saved to localStorage', 'info');
-        }
-
-        function deepMerge(target, source) {
-            const result = JSON.parse(JSON.stringify(target));
-            for (let key in source) {
-                if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-                    result[key] = deepMerge(result[key] || {}, source[key]);
-                } else {
-                    result[key] = source[key];
-                }
-            }
-            return result;
-        }
-
-        function setStatus(text, type = 'info') {
-            statusMsg.textContent = text;
-            statusMsg.className = 'status-bar ' + type;
-        }
-
-        function updateCloudStatus(synced) {
-            isCloudSynced = synced;
-            if (synced) {
-                cloudStatus.className = 'cloud-status synced';
-                cloudStatus.textContent = '☁️ Synced ✓';
-                saveBtn.className = 'btn-cloud-save saved';
-                saveBtn.textContent = '✅ Saved to Cloud';
-                logDebug('☁️ Cloud status: Synced ✓', 'success');
-            } else {
-                cloudStatus.className = 'cloud-status unsynced';
-                cloudStatus.textContent = '☁️ Unsaved';
-                saveBtn.className = 'btn-cloud-save';
-                saveBtn.textContent = '💾 Save to Cloud';
-                logDebug('☁️ Cloud status: Unsaved', 'warning');
-            }
-        }
-
-        // ======================== COLLECT FROM DOM ========================
-        function collectFromDOM() {
-            logDebug('📊 Collecting data from DOM...', 'info');
-            
-            const bioInputs = document.querySelectorAll('#bioDataContainer input');
-            bioInputs.forEach(inp => {
-                const key = inp.dataset.key;
-                if (key) {
-                    const val = inp.value;
-                    if (key === 'attendance' || key === 'outOf' || key === 'numberInClass') {
-                        currentData.student[key] = parseFloat(val) || 0;
-                    } else {
-                        currentData.student[key] = val;
-                    }
-                }
-            });
-
-            const rows = document.querySelectorAll('#scoresBody tr');
-            rows.forEach((tr, idx) => {
-                const inputs = tr.querySelectorAll('input');
-                if (inputs.length === 15 && currentData.subjects[idx]) {
-                    const subj = currentData.subjects[idx];
-                    subj.name = tr.querySelector('td:first-child')?.textContent || '';
-                    subj.test1 = inputs[1].value;
-                    subj.test2 = inputs[2].value;
-                    subj.test3 = inputs[3].value;
-                    subj.ass1 = inputs[4].value;
-                    subj.ass2 = inputs[5].value;
-                    subj.ass3 = inputs[6].value;
-                    subj.casum = inputs[7].value;
-                    subj.exam = inputs[8].value;
-                    subj.total = inputs[9].value;
-                    subj.cummBf = inputs[10].value;
-                    subj.cummScore = inputs[11].value;
-                    subj.avg = inputs[12].value;
-                    subj.pos = inputs[13].value;
-                    subj.grade = inputs[14].value;
-                }
-            });
-
-            const charRows = document.querySelectorAll('#characterTable tr:not(:first-child)');
-            charRows.forEach((tr, idx) => {
-                const inputs = tr.querySelectorAll('input');
-                if (inputs.length === 2 && currentData.characterDevelopment[idx]) {
-                    currentData.characterDevelopment[idx].trait = inputs[0].value;
-                    currentData.characterDevelopment[idx].rating = parseFloat(inputs[1].value) || 0;
-                }
-            });
-
-            const pracRows = document.querySelectorAll('#practicalTable tr:not(:first-child)');
-            pracRows.forEach((tr, idx) => {
-                const inputs = tr.querySelectorAll('input');
-                if (inputs.length === 2 && currentData.practicalSkills[idx]) {
-                    currentData.practicalSkills[idx].skill = inputs[0].value;
-                    currentData.practicalSkills[idx].rating = parseFloat(inputs[1].value) || 0;
-                }
-            });
-
-            const remarkRows = document.querySelectorAll('#remarksBody tr');
-            remarkRows.forEach((tr, idx) => {
-                const inputs = tr.querySelectorAll('input');
-                if (inputs.length === 2 && currentData.remarks[idx]) {
-                    currentData.remarks[idx].category = inputs[0].value;
-                    currentData.remarks[idx].text = inputs[1].value;
-                }
-            });
-            
-            logDebug('✅ DOM data collected successfully', 'success', { student: currentData.student.name });
-        }
-
-        // ======================== RENDER ========================
-        function render() {
-            logDebug('🖥️ Rendering data to DOM...', 'info');
-            const data = currentData;
-            const s = data.student;
-
-            const bioContainer = document.getElementById('bioDataContainer');
-            bioContainer.innerHTML = `
-                <table class="table-small">
-                    <tr><th>Student's Name:</th><td><input type="text" data-key="name" value="${s.name}"></td></tr>
-                    <tr><th>Class</th><td><input type="text" data-key="class" value="${s.class}"></td></tr>
-                    <tr><th>Term</th><td><input type="text" data-key="term" value="${s.term}"></td></tr>
-                    <tr><th>Session</th><td><input type="text" data-key="session" value="${s.session}"></td></tr>
-                </table>
-                <table class="table-small">
-                    <tr><th>House</th><td><input type="text" data-key="house" value="${s.house}"></td></tr>
-                    <tr><th>Attendance</th><td><input type="number" data-key="attendance" value="${s.attendance}"></td></tr>
-                    <tr><th>Out Of</th><td><input type="number" data-key="outOf" value="${s.outOf}"></td></tr>
-                    <tr><th>Number in Class</th><td><input type="number" data-key="numberInClass" value="${s.numberInClass}"></td></tr>
-                </table>
-            `;
-            document.getElementById('welcomeName').textContent = `Student: ${s.name}`;
-            document.getElementById('reportHeader').textContent = `${s.session} · ${s.term} TERM REPORT SHEET`;
-            const img = document.getElementById('student-image');
-            if (s.image) img.src = s.image;
-
-            const tbody = document.getElementById('scoresBody');
-            tbody.innerHTML = '';
-            data.subjects.forEach(subj => {
-                const tr = document.createElement('tr');
-                const tdSubj = document.createElement('td');
-                tdSubj.textContent = subj.name || '';
-                tr.appendChild(tdSubj);
-                
-                const fields = [
-                    subj.test1, subj.test2, subj.test3, subj.ass1, subj.ass2, subj.ass3,
-                    subj.casum, subj.exam, subj.total, subj.cummBf, subj.cummScore,
-                    subj.avg, subj.pos, subj.grade
-                ];
-                
-                fields.forEach((val, i) => {
-                    const td = document.createElement('td');
-                    const inp = document.createElement('input');
-                    inp.type = 'text';
-                    inp.value = val !== undefined && val !== null ? val : '';
-                    if (i === 6 || i === 8 || i === 10 || i === 11 || i === 13) {
-                        inp.readOnly = true;
-                        inp.style.fontWeight = '600';
-                        inp.style.background = '#e8dfd2';
-                    }
-                    td.appendChild(inp);
-                    tr.appendChild(td);
-                });
-                tbody.appendChild(tr);
-            });
-
-            const skillsContainer = document.getElementById('skillsContainer');
-            let charHTML = `<div class="table-small"><table id="characterTable"><tr><th>Character Development</th><th>Rating</th></tr>`;
-            data.characterDevelopment.forEach(item => {
-                charHTML += `<tr><td><input type="text" value="${item.trait}"></td><td><input type="number" value="${item.rating}" min="1" max="5"></td></tr>`;
-            });
-            charHTML += `</table></div>`;
-
-            let pracHTML = `<div class="table-small"><table id="practicalTable"><tr><th>Practical Skills</th><th>Rating</th></tr>`;
-            data.practicalSkills.forEach(item => {
-                pracHTML += `<tr><td><input type="text" value="${item.skill}"></td><td><input type="number" value="${item.rating}" min="1" max="5"></td></tr>`;
-            });
-            pracHTML += `</table></div>`;
-            skillsContainer.innerHTML = charHTML + pracHTML;
-
-            const remarksBody = document.getElementById('remarksBody');
-            remarksBody.innerHTML = '';
-            data.remarks.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><input type="text" value="${item.category}"></td>
-                    <td><input type="text" value="${item.text}"></td>
-                    <td>........................ / ....................</td>
-                `;
-                remarksBody.appendChild(tr);
-            });
-
-            autoCalculate();
-            logDebug('✅ DOM rendered successfully', 'success');
-        }
-
-        // ======================== AUTO CALCULATE ========================
-        function autoCalculate() {
-            const rows = document.querySelectorAll('#scoresBody tr');
-            rows.forEach((tr) => {
-                const inputs = tr.querySelectorAll('input');
-                if (inputs.length < 15) return;
-                
-                const t1 = parseFloat(inputs[1].value) || 0;
-                const t2 = parseFloat(inputs[2].value) || 0;
-                const t3 = parseFloat(inputs[3].value) || 0;
-                const a1 = parseFloat(inputs[4].value) || 0;
-                const a2 = parseFloat(inputs[5].value) || 0;
-                const a3 = parseFloat(inputs[6].value) || 0;
-                const exam = parseFloat(inputs[8].value) || 0;
-                const cummBf = parseFloat(inputs[10].value) || 0;
-
-                const sum6 = t1 + t2 + t3 + a1 + a2 + a3;
-                const casum = sum6 / 6;
-                const total = casum + (exam / 2);
-                const cummScore = (cummBf + total) / 2;
-                const avg = cummScore;
-
-                let grade = '-';
-                if (avg >= 75) grade = 'A (Excellent)';
-                else if (avg >= 65) grade = 'B (Good)';
-                else if (avg >= 50) grade = 'C (Average)';
-                else if (avg >= 40) grade = 'D (Fair)';
-                else if (avg >= 0) grade = 'F (Poor)';
-
-                inputs[7].value = casum.toFixed(2);
-                inputs[9].value = total.toFixed(2);
-                inputs[11].value = cummScore.toFixed(2);
-                inputs[12].value = avg.toFixed(2);
-                inputs[14].value = grade;
-            });
-        }
-
-        // ======================== EXPORT ========================
-        function collectFullData() {
-            collectFromDOM();
-            logDebug('📦 Full data collected for export', 'info');
-            return currentData;
-        }
-
-        function exportJSON() {
-            logDebug('📥 Exporting JSON...', 'info');
-            const data = collectFullData();
-            const json = JSON.stringify(data, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `score_sheet_${data.student.name}_${data.student.session}.json`;
-            link.click();
-            URL.revokeObjectURL(link.href);
-            setStatus('✅ JSON exported', 'success');
-            logDebug('✅ JSON exported successfully', 'success', { filename: link.download });
-        }
-
-        function resetToDefault() {
-            if (confirm('Reset all data to default values?')) {
-                currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
-                render();
-                setStatus('↺ Reset to default', 'info');
-                logDebug('↺ Data reset to default', 'info');
-            }
-        }
-
-        // ======================== THEME ========================
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        if (localStorage.getItem('theme') === 'dark' ||
-            (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme'))) {
-            body.classList.add('dark-theme');
-            themeToggle.textContent = '☀️ Light Mode';
-        } else {
-            body.classList.remove('dark-theme');
-            themeToggle.textContent = '🌙 Dark Mode';
-        }
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-theme');
-            const isDark = body.classList.contains('dark-theme');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            themeToggle.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
-        });
-
-        // ======================== LOGIN MODAL EVENTS ========================
-        loginBtn.addEventListener('click', () => {
-            loginOverlay.classList.add('show');
-            loginError.className = 'login-error';
-            loginEmail.value = ADMIN_EMAIL;
-            loginPassword.value = ADMIN_PASSWORD;
-            loginPassword.focus();
-        });
-
-        loginOverlay.addEventListener('click', (e) => {
-            if (e.target === loginOverlay) {
-                loginOverlay.classList.remove('show');
-            }
-        });
-
-        loginSubmitBtn.addEventListener('click', () => {
-            const email = loginEmail.value.trim();
-            const password = loginPassword.value.trim();
-            loginSubmitBtn.disabled = true;
-            loginSubmitBtn.textContent = '⏳ Logging in...';
-            
-            setTimeout(() => {
-                const success = login(email, password);
-                loginSubmitBtn.disabled = false;
-                loginSubmitBtn.textContent = 'Login';
-                if (success) {
-                    loginOverlay.classList.remove('show');
-                }
-            }, 500);
-        });
-
-        // Enter key on login
-        loginEmail.addEventListener('keydown', (e) => { if (e.key === 'Enter') loginPassword.focus(); });
-        loginPassword.addEventListener('keydown', (e) => { if (e.key === 'Enter') loginSubmitBtn.click(); });
-
-        // ======================== LOGOUT ========================
-        logoutBtn.addEventListener('click', logout);
-
-        // ======================== INIT ========================
-        logDebug('🚀 Application starting...', 'info');
-        
-        // Check stored auth
-        const storedUser = getStoredUser();
-        if (storedUser && storedUser.email === ADMIN_EMAIL) {
-            currentAuthUser = storedUser;
-            updateAuthUI(storedUser);
-            logDebug('✅ Restored session from localStorage', 'success', { email: storedUser.email });
-        } else {
-            updateAuthUI(null);
-            logDebug('🔓 No active session', 'info');
-        }
-        
-        loadData();
-        render();
-        updateCloudStatus(false);
-        logDebug('✅ Application ready', 'success');
-
-        // Auto-save to localStorage on input change
-        document.addEventListener('input', function(e) {
-            if (e.target.tagName === 'INPUT') {
-                const parentRow = e.target.closest('tr');
-                if (parentRow && parentRow.closest('#scoresBody')) {
-                    autoCalculate();
-                }
-                saveData();
-                updateCloudStatus(false);
-            }
-        });
-
-        document.addEventListener('blur', function(e) {
-            if (e.target.tagName === 'INPUT' && e.target.type === 'number') {
-                const parentRow = e.target.closest('tr');
-                if (parentRow && parentRow.closest('#scoresBody')) {
-                    autoCalculate();
-                    saveData();
-                    updateCloudStatus(false);
-                }
-            }
-        }, true);
-
-        // Export JSON
-        exportJsonBtn.addEventListener('click', exportJSON);
-
-        // Expose functions to window for Firestore module
-        window.collectFullData = collectFullData;
-        window.render = render;
-        window.currentData = currentData;
-        window.updateCloudStatus = updateCloudStatus;
-        window.logDebug = logDebug;
-        window.resetToDefault = resetToDefault;
-        window.currentAuthUser = currentAuthUser;
-        window.isAuthenticated = isAuthenticated;
-        window.logout = logout;
-        window.login = login;
-    </script>
-
-    <!-- ==================== FIRESTORE INTEGRATION ==================== -->
-    <script type="module">
-        // ==================== FIREBASE IMPORTS ====================
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged,
-            signInWithEmailAndPassword,
-            signOut
-        } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            getDoc, 
-            setDoc, 
-            serverTimestamp
-        } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-
-        // ==================== FIREBASE CONFIG ====================
-        const firebaseConfig = {
-            apiKey: "AIzaSyCMS9yCW7gGln1X4rMq33RHoYeFWBLM0-E",
-            authDomain: "broadsheet-492aa.firebaseapp.com",
-            projectId: "broadsheet-492aa",
-            storageBucket: "broadsheet-492aa.firebasestorage.app",
-            messagingSenderId: "631605688845",
-            appId: "1:631605688845:web:5ebfa528d7596f21033344",
-            measurementId: "G-5DSG36J39H"
-        };
-
-        // ==================== INITIALIZE ====================
-        logDebug('🔥 Initializing Firebase...', 'info');
-        
-        let app, auth, db;
-        let currentFirebaseUser = null;
-        let isSaving = false;
-
-        function logDebug(message, type = 'info', data = null) {
-            if (typeof window.logDebug === 'function') {
-                window.logDebug(`[Firestore] ${message}`, type, data);
-            }
-            console.log(`[FIRESTORE] ${message}`, data || '');
-        }
-
-        function setStatus(text, type = 'info') {
-            const statusMsg = document.getElementById('statusMsg');
-            statusMsg.textContent = text;
-            statusMsg.className = 'status-bar ' + type;
+        // Check authentication
+        const storedUser = localStorage.getItem(AUTH_STORAGE_KEY);
+        if (!storedUser) {
+            window.location.href = 'login_firebase.html';
+            return;
         }
 
         try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            
-            window.firebaseApp = app;
-            window.firebaseAuth = auth;
-            window.firebaseDb = db;
-            
-            logDebug('✅ Firebase initialized successfully', 'success', { 
-                projectId: firebaseConfig.projectId,
-                authDomain: firebaseConfig.authDomain
-            });
-        } catch (error) {
-            logDebug('❌ Firebase initialization failed', 'error', error.message);
-        }
-
-        // ==================== AUTH CALLBACK ====================
-        // This will be called from the main script when auth state changes
-        window.onAuthStateChangedCallback = function(user) {
-            // This is handled by the main script's auth system
-            // We just need to check if the user is authenticated
-            const isAuth = typeof window.isAuthenticated === 'function' ? window.isAuthenticated() : false;
-            if (isAuth) {
-                // User is authenticated via our custom auth
-                // We don't need to do anything else
-            }
-        };
-
-        // ==================== SAVE TO FIRESTORE ====================
-        async function saveToFirestore() {
-            // Check if user is authenticated via our custom auth
-            const isAuth = typeof window.isAuthenticated === 'function' ? window.isAuthenticated() : false;
-            
-            if (!isAuth) {
-                logDebug('❌ Save failed: User not authenticated', 'error');
-                setStatus('⚠️ Please login to save to Firestore', 'error');
-                return;
-            }
-
-            if (isSaving) {
-                logDebug('⏳ Save already in progress, skipping', 'warning');
+            const user = JSON.parse(storedUser);
+            if (user.email !== ADMIN_EMAIL) {
+                localStorage.removeItem(AUTH_STORAGE_KEY);
+                window.location.href = 'login_firebase.html';
                 return;
             }
             
-            isSaving = true;
-            const saveBtn = document.getElementById('saveBtn');
-            saveBtn.disabled = true;
-            saveBtn.className = 'btn-cloud-save saving';
-            saveBtn.textContent = '⏳ Saving...';
-            setStatus('⏳ Saving to Firestore...', 'saving');
-            logDebug('⏳ Starting save operation...', 'info');
-
-            try {
-                // Collect data from DOM
-                logDebug('📊 Collecting data from DOM...', 'info');
-                const data = window.collectFullData ? window.collectFullData() : null;
-                
-                if (!data) {
-                    throw new Error('Could not collect data from DOM');
-                }
-                
-                logDebug('✅ Data collected successfully', 'success', { 
-                    student: data.student.name,
-                    subjects: data.subjects.length
-                });
-
-                const studentId = data.student.name.replace(/\s+/g, '_').toLowerCase();
-                logDebug(`📌 Student ID: ${studentId}`, 'info');
-                
-                const docRef = doc(db, 'scoreSheets', studentId);
-                logDebug(`📄 Document reference: scoreSheets/${studentId}`, 'info');
-                
-                const saveData = {
-                    ...data,
-                    ownerId: 'wisdom_admin',
-                    ownerEmail: 'wisdom_admin@gmail.com',
-                    studentId: studentId,
-                    updatedAt: serverTimestamp(),
-                    lastSaved: new Date().toISOString()
-                };
-                
-                logDebug('📦 Data prepared for Firestore', 'info', { 
-                    fields: Object.keys(saveData),
-                    studentName: saveData.student.name
-                });
-
-                logDebug('💾 Writing to Firestore...', 'info');
-                await setDoc(docRef, saveData, { merge: true });
-                
-                logDebug('✅ Firestore write successful!', 'success');
-                
-                // Store the student ID for future reference
-                localStorage.setItem('wisdom_current_student_id', studentId);
-                
-                setStatus(`✅ Data saved to Firestore for ${data.student.name}!`, 'success');
-                if (typeof window.updateCloudStatus === 'function') {
-                    window.updateCloudStatus(true);
-                }
-                
-                saveBtn.className = 'btn-cloud-save saved';
-                saveBtn.textContent = '✅ Saved to Cloud';
-                logDebug('🎉 Save operation completed successfully!', 'success');
-                
-            } catch (error) {
-                logDebug('❌ Firestore save error', 'error', { 
-                    message: error.message,
-                    code: error.code,
-                    stack: error.stack
-                });
-                
-                setStatus(`❌ Error saving to Firestore: ${error.message}`, 'error');
-                saveBtn.className = 'btn-cloud-save';
-                saveBtn.textContent = '💾 Save to Cloud';
-                if (typeof window.updateCloudStatus === 'function') {
-                    window.updateCloudStatus(false);
-                }
-            } finally {
-                isSaving = false;
-                saveBtn.disabled = false;
-                logDebug('🔓 Save operation completed', 'info');
+            // Display user info
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userRole').textContent = 'Administrator';
+            if (user.loginTime) {
+                const date = new Date(user.loginTime);
+                document.getElementById('loginTime').textContent = date.toLocaleString();
             }
+        } catch(e) {
+            localStorage.removeItem(AUTH_STORAGE_KEY);
+            window.location.href = 'login_firebase.html';
         }
 
-        // ==================== LOAD FROM FIRESTORE ====================
-        async function loadFromFirestore(studentId = null) {
-            const isAuth = typeof window.isAuthenticated === 'function' ? window.isAuthenticated() : false;
-            
-            if (!isAuth) {
-                logDebug('❌ Load failed: User not authenticated', 'error');
-                setStatus('⚠️ Please login to load from Firestore', 'error');
-                return;
-            }
-
-            if (!studentId) {
-                studentId = localStorage.getItem('wisdom_current_student_id');
-                logDebug(`📌 Using stored student ID: ${studentId || 'none'}`, 'info');
-                
-                if (!studentId) {
-                    const name = prompt('Enter student name to load (e.g., SHEHU AMHEED MARVELOUS):');
-                    if (!name) {
-                        logDebug('❌ Load cancelled: No name provided', 'warning');
-                        return;
-                    }
-                    studentId = name.replace(/\s+/g, '_').toLowerCase();
-                    logDebug(`📌 Generated student ID: ${studentId}`, 'info');
-                }
-            }
-
-            try {
-                const docRef = doc(db, 'scoreSheets', studentId);
-                logDebug(`📄 Fetching document: scoreSheets/${studentId}`, 'info');
-                
-                const docSnap = await getDoc(docRef);
-                logDebug(`📄 Document exists: ${docSnap.exists()}`, 'info');
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    logDebug('📦 Data retrieved from Firestore', 'success', { 
-                        student: data.student?.name,
-                        owner: data.ownerEmail,
-                        lastSaved: data.lastSaved
-                    });
-                    
-                    // Remove metadata before loading
-                    delete data.ownerId;
-                    delete data.ownerEmail;
-                    delete data.updatedAt;
-                    delete data.lastSaved;
-                    delete data.createdAt;
-                    delete data.studentId;
-                    
-                    // Update the data
-                    if (typeof window.currentData !== 'undefined') {
-                        window.currentData = data;
-                    }
-                    localStorage.setItem('wisdom_score_sheet_data', JSON.stringify(data));
-                    localStorage.setItem('wisdom_current_student_id', studentId);
-                    
-                    // Re-render
-                    if (typeof window.render === 'function') {
-                        window.render();
-                        logDebug('✅ DOM re-rendered with loaded data', 'success');
-                    }
-                    
-                    setStatus(`✅ Data loaded from Firestore for ${data.student.name}!`, 'success');
-                    if (typeof window.updateCloudStatus === 'function') {
-                        window.updateCloudStatus(true);
-                    }
-                    logDebug('🎉 Load operation completed successfully!', 'success');
-                } else {
-                    logDebug(`📭 No document found for student ID: ${studentId}`, 'warning');
-                    setStatus(`ℹ️ No data found in Firestore for this student.`, 'info');
-                }
-            } catch (error) {
-                logDebug('❌ Firestore load error', 'error', { 
-                    message: error.message,
-                    code: error.code,
-                    stack: error.stack
-                });
-                setStatus(`❌ Error loading from Firestore: ${error.message}`, 'error');
-            }
-        }
-
-        // ==================== SAVE BUTTON ====================
-        const saveBtn = document.getElementById('saveBtn');
-        saveBtn.addEventListener('click', () => {
-            logDebug('🖱️ Save button clicked', 'info');
-            saveToFirestore();
+        // Go to Score Sheet
+        document.getElementById('goToScoreSheetBtn').addEventListener('click', function() {
+            window.location.href = 'score_sheet.html';
         });
 
-        // ==================== EXPOSE FUNCTIONS ====================
-        window.saveToFirestore = saveToFirestore;
-        window.loadFromFirestore = loadFromFirestore;
-
-        logDebug('✅ Firestore integration loaded successfully!', 'success');
-        logDebug('💡 Click "Save to Cloud" to sync to Firestore', 'info');
-        logDebug('🔐 Use wisdom_admin@gmail.com / admin_123 to login', 'info');
-        logDebug('🐛 Open debug log to see detailed operations', 'info');
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem(AUTH_STORAGE_KEY);
+            window.location.href = 'login_firebase.html';
+        });
     </script>
 </body>
 </html>
