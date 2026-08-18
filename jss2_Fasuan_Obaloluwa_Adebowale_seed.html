@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seed Data - Firestore</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 { text-align: center; color: #333; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+        .info-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        .info-box strong { color: #333; }
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            display: none;
+        }
+        .status.success { display: block; background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .status.error { display: block; background: #fee; color: #c0392b; border: 1px solid #fcc; }
+        .status.info { display: block; background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 5px 0;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        button.secondary { background: #3498db; }
+        button.secondary:hover { background: #2980b9; }
+        button.danger { background: #e74c3c; }
+        button.danger:hover { background: #c0392b; }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-group button { flex: 1; min-width: 120px; }
+        .log-container {
+            margin-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            padding-top: 15px;
+        }
+        .log-toggle {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #555;
+            width: auto;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .log-toggle:hover { background: #e8e8e8; }
+        .log {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            display: none;
+        }
+        .log.show { display: block; }
+        .log .timestamp { color: #858585; }
+        .log .success { color: #81c784; }
+        .log .error { color: #ef5350; }
+        .log .info { color: #4fc3f7; }
+        .log .warning { color: #ffd54f; }
+        .log .data { color: #ce93d8; }
+        .user-info {
+            background: #f0f0f0;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .user-info strong { color: #333; }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s;
+            border-radius: 3px;
+        }
+        .progress-bar.show { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌱 Seed Firestore Data</h1>
+        <p class="subtitle">Populate your Firestore database with default score sheet data</p>
+
+        <div class="info-box">
+            <strong>⚠️ Important:</strong> You must be <strong>logged in</strong> to seed data.
+            This will create a score sheet document in Firestore linked to your user account.
+        </div>
+
+        <div id="userInfo" class="user-info" style="display:none;">
+            <strong>👤 Logged in as:</strong> <span id="userEmail">Loading...</span>
+            <br />
+            <strong>🆔 UID:</strong> <span id="userUid">Loading...</span>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div class="progress-bar" id="progressBar">
+            <div class="fill" id="progressFill"></div>
+        </div>
+
+        <div class="btn-group">
+            <button id="seedBtn">🌱 Seed Default Data</button>
+            <button id="checkBtn" class="secondary">🔍 Check Existing</button>
+            <button id="deleteBtn" class="danger">🗑️ Delete My Data</button>
+        </div>
+
+        <div class="log-container">
+            <button class="log-toggle" id="logToggle">🔍 Show Log</button>
+            <div class="log" id="log"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // ==================== FIREBASE IMPORTS ====================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc, 
+            deleteDoc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+        // ==================== FIREBASE CONFIG ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMS9yCW7gGln1X4rMq33RHoYeFWBLM0-E",
+            authDomain: "broadsheet-492aa.firebaseapp.com",
+            projectId: "broadsheet-492aa",
+            storageBucket: "broadsheet-492aa.firebasestorage.app",
+            messagingSenderId: "631605688845",
+            appId: "1:631605688845:web:5ebfa528d7596f21033344",
+            measurementId: "G-5DSG36J39H"
+        };
+
+        // ==================== INITIALIZE ====================
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // ==================== DOM ELEMENTS ====================
+        const statusDiv = document.getElementById('status');
+        const logDiv = document.getElementById('log');
+        const logToggle = document.getElementById('logToggle');
+        const seedBtn = document.getElementById('seedBtn');
+        const checkBtn = document.getElementById('checkBtn');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const userInfo = document.getElementById('userInfo');
+        const userEmail = document.getElementById('userEmail');
+        const userUid = document.getElementById('userUid');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+
+        let currentUser = null;
+
+        // ==================== LOGGER ====================
+        function log(message, type = 'info', data = null) {
+            const timestamp = new Date().toISOString();
+            const entry = document.createElement('div');
+            const dataStr = data ? `\n📦 ${JSON.stringify(data, null, 2)}` : '';
+            entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="${type}">${message}</span>${dataStr}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[SEED] ${message}`, data || '');
+        }
+
+        logToggle.addEventListener('click', () => {
+            logDiv.classList.toggle('show');
+            logToggle.textContent = logDiv.classList.contains('show') ? '🔒 Hide Log' : '🔍 Show Log';
+        });
+
+        // ==================== STATUS ====================
+        function showStatus(message, type = 'info') {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            log(message, type);
+        }
+
+        function setProgress(percent) {
+            progressBar.classList.add('show');
+            progressFill.style.width = `${percent}%`;
+            if (percent >= 100) {
+                setTimeout(() => {
+                    progressBar.classList.remove('show');
+                }, 1000);
+            }
+        }
+
+        // ==================== DEFAULT DATA (FIXED - NO NESTED ARRAYS) ====================
+        const DEFAULT_DATA = {
+            student: {
+                name: "FASUAN OBALOLUWA ADEBOWALE",
+                class: "JUNIOR JSS2",
+                term: "FIRST",
+                session: "2026/2027",
+                house: "Red",
+                attendance: 110,
+                outOf: 120,
+                numberInClass: 2,
+                image: "img/wfs102.png"
+            },
+            // ✅ FIXED: Subjects as an array of objects instead of nested arrays
+            subjects: [
+                { name: "ENGLISH LANGUAGE.", test1: 34, test2: 40, test3: 58, ass1: 10, ass2: 12, ass3: 11, casum: 165, exam: 41, total: 103, cummBf: 70, cummScore: 86, avg: 72, pos: "3rd", grade: "A" },
+                { name: "MATHEMATICS", test1: 50, test2: 60, test3: 65, ass1: 15, ass2: 18, ass3: 20, casum: 228, exam: 55, total: 141, cummBf: 65, cummScore: 103, avg: 68, pos: "2nd", grade: "A" },
+                { name: "DIGITAL TECHNOLOGY", test1: 60, test2: 70, test3: 100, ass1: 20, ass2: 22, ass3: 25, casum: 297, exam: 72, total: 184, cummBf: 80, cummScore: 132, avg: 74, pos: "1st", grade: "A" },
+                { name: "CITIZENSHIP & HERITAGE", test1: 50, test2: 60, test3: 50, ass1: 12, ass2: 14, ass3: 16, casum: 202, exam: 58, total: 121, cummBf: 60, cummScore: 90, avg: 62, pos: "5th", grade: "B" },
+                { name: "CRK", test1: 70, test2: 62, test3: 50, ass1: 18, ass2: 15, ass3: 20, casum: 235, exam: 58, total: 148, cummBf: 68, cummScore: 108, avg: 65, pos: "4th", grade: "B" },
+                { name: "HISTORY", test1: 50, test2: 56, test3: 40, ass1: 10, ass2: 12, ass3: 14, casum: 182, exam: 53, total: 96, cummBf: 55, cummScore: 75, avg: 58, pos: "6th", grade: "C" },
+                { name: "YORUBA", test1: 80, test2: 45, test3: 55, ass1: 8, ass2: 10, ass3: 12, casum: 210, exam: 45, total: 116, cummBf: 62, cummScore: 89, avg: 60, pos: "7th", grade: "C" },
+                { name: "PHE", test1: 50, test2: 56, test3: 40, ass1: 15, ass2: 18, ass3: 20, casum: 199, exam: 53, total: 118, cummBf: 58, cummScore: 88, avg: 61, pos: "8th", grade: "C" },
+                { name: "FRENCH", test1: 50, test2: 56, test3: 40, ass1: 6, ass2: 8, ass3: 10, casum: 170, exam: 53, total: 88, cummBf: 50, cummScore: 69, avg: 55, pos: "9th", grade: "D" },
+                { name: "SOCIAL STUDIES", test1: 50, test2: 56, test3: 40, ass1: 12, ass2: 14, ass3: 16, casum: 188, exam: 53, total: 100, cummBf: 54, cummScore: 77, avg: 56, pos: "10th", grade: "D" },
+                { name: "BUSINESS STUDIES", test1: 50, test2: 56, test3: 40, ass1: 9, ass2: 11, ass3: 13, casum: 179, exam: 53, total: 95, cummBf: 52, cummScore: 73, avg: 54, pos: "11th", grade: "D" },
+                { name: "BASIC SCIENCE", test1: 50, test2: 56, test3: 40, ass1: 14, ass2: 16, ass3: 18, casum: 194, exam: 53, total: 101, cummBf: 56, cummScore: 78, avg: 57, pos: "12th", grade: "D" },
+                { name: "CCA", test1: "75", test2: "70", test3: "70", ass1: "-", ass2: "-", ass3: "-", casum: "-", exam: "-", total: "-", cummBf: "-", cummScore: "-", avg: "-", pos: "-", grade: "-" }
+            ],
+            characterDevelopment: [
+                { trait: "Punctuality", rating: 4 },
+                { trait: "Attentiveness", rating: 5 },
+                { trait: "Neatness", rating: 3 },
+                { trait: "Honesty", rating: 4 },
+                { trait: "Relationship", rating: 4 }
+            ],
+            practicalSkills: [
+                { skill: "Sport", rating: 3 },
+                { skill: "Club", rating: 4 },
+                { skill: "Fluency", rating: 5 },
+                { skill: "Handwriting", rating: 4 }
+            ],
+            remarks: [
+                { category: "Teacher Remark", text: "Shows great improvement, keep it up." },
+                { category: "House masters Remark", text: "Well behaved and respectful." },
+                { category: "Principal Remark", text: "Good academic standing, encouraged to do more." },
+                { category: "Next Term", text: "January 15 2027" },
+                { category: "Promoted To", text: "-----" }
+            ]
+        };
+
+        // ==================== AUTH STATE ====================
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                userInfo.style.display = 'block';
+                userEmail.textContent = user.email;
+                userUid.textContent = user.uid;
+                log(`✅ Logged in as: ${user.email}`, 'success');
+                log(`🆔 UID: ${user.uid}`, 'info');
+                showStatus(`✅ Logged in as: ${user.email}`, 'success');
+                seedBtn.disabled = false;
+                checkBtn.disabled = false;
+                deleteBtn.disabled = false;
+            } else {
+                currentUser = null;
+                userInfo.style.display = 'none';
+                log('❌ Not logged in. Please login first.', 'error');
+                showStatus('❌ Not logged in. Please login first.', 'error');
+                seedBtn.disabled = true;
+                checkBtn.disabled = true;
+                deleteBtn.disabled = true;
+            }
+        });
+
+        // ==================== SEED DATA ====================
+        async function seedData() {
+            if (!currentUser) {
+                showStatus('❌ Please login first!', 'error');
+                return;
+            }
+
+            seedBtn.disabled = true;
+            seedBtn.textContent = '⏳ Seeding...';
+            setProgress(0);
+
+            try {
+                const userId = currentUser.uid;
+                const docRef = doc(db, 'scoreSheets', userId);
+                
+                log(`📝 Preparing to seed data for user: ${userId}`, 'info');
+                setProgress(20);
+
+                const seedData = {
+                    ...DEFAULT_DATA,
+                    ownerId: userId,
+                    ownerEmail: currentUser.email,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                    version: '1.0'
+                };
+
+                log('📦 Seed data prepared (no nested arrays!)', 'info');
+                setProgress(40);
+
+                // Check if document already exists
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    log('⚠️ Document already exists. Updating...', 'warning');
+                    setProgress(60);
+                } else {
+                    log('📄 Creating new document...', 'info');
+                    setProgress(60);
+                }
+
+                // Save to Firestore
+                log('💾 Writing to Firestore...', 'info');
+                await setDoc(docRef, seedData);
+                setProgress(90);
+                
+                log('✅ Data seeded successfully!', 'success');
+                showStatus('✅ Data seeded successfully! Check Firestore.', 'success');
+                setProgress(100);
+
+            } catch (error) {
+                log(`❌ Error seeding data: ${error.message}`, 'error', error);
+                
+                let errorMsg = error.message;
+                if (error.code === 'permission-denied') {
+                    errorMsg = 'Permission denied. Please check your Firestore rules.';
+                    log('🔑 Firestore rules are blocking the write operation.', 'error');
+                }
+                
+                showStatus(`❌ Error: ${errorMsg}`, 'error');
+                setProgress(0);
+            } finally {
+                seedBtn.disabled = false;
+                seedBtn.textContent = '🌱 Seed Default Data';
+            }
+        }
+
+        // ==================== CHECK DATA ====================
+        async function checkData() {
+            if (!currentUser) {
+                showStatus('❌ Please login first!', 'error');
+                return;
+            }
+
+            checkBtn.disabled = true;
+            checkBtn.textContent = '⏳ Checking...';
+
+            try {
+                const docRef = doc(db, 'scoreSheets', currentUser.uid);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    log('📊 Document exists!', 'success', data);
+                    showStatus('✅ Document exists in Firestore!', 'success');
+                } else {
+                    log('📭 No document found in Firestore.', 'warning');
+                    showStatus('⚠️ No document found. Use "Seed Default Data" to create one.', 'info');
+                }
+
+            } catch (error) {
+                log(`❌ Error checking data: ${error.message}`, 'error', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                checkBtn.disabled = false;
+                checkBtn.textContent = '🔍 Check Existing';
+            }
+        }
+
+        // ==================== DELETE DATA ====================
+        async function deleteData() {
+            if (!currentUser) {
+                showStatus('❌ Please login first!', 'error');
+                return;
+            }
+
+            if (!confirm('⚠️ Are you sure you want to delete ALL your data from Firestore?')) {
+                return;
+            }
+
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = '⏳ Deleting...';
+
+            try {
+                const docRef = doc(db, 'scoreSheets', currentUser.uid);
+                await deleteDoc(docRef);
+                
+                log('🗑️ Document deleted successfully!', 'success');
+                showStatus('🗑️ Document deleted successfully!', 'success');
+
+            } catch (error) {
+                log(`❌ Error deleting data: ${error.message}`, 'error', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = '🗑️ Delete My Data';
+            }
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        seedBtn.addEventListener('click', seedData);
+        checkBtn.addEventListener('click', checkData);
+        deleteBtn.addEventListener('click', deleteData);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                seedData();
+            }
+        });
+
+        log('✅ Seed page ready!', 'success');
+        log('💡 Press Ctrl+Enter to seed data quickly', 'info');
+        log('🔑 Make sure you are logged in first!', 'info');
+    </script>
+</body>
+</html>
