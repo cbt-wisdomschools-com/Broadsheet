@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sheet Board - WISDOM FOUNADATION SCHOOLS EGBEWA ADO EKITI</title>
+    <title>Sheet Board - WISDOM FOUNDATION SCHOOLS EGBEWA ADO EKITI</title>
     <style>
         * {
             margin: 0;
@@ -98,6 +98,46 @@
             border: 1px solid #e8d5b5;
         }
 
+        /* User Info Badge */
+        .user-info-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fdf6ee;
+            padding: 8px 20px 8px 16px;
+            border-radius: 40px;
+            border: 2px solid #e8d5b5;
+        }
+
+        .user-info-badge .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B6914, #b8860b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-info-badge .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-info-badge .user-name {
+            font-weight: 700;
+            color: #5a3e1b;
+            font-size: 14px;
+        }
+
+        .user-info-badge .user-email {
+            font-size: 11px;
+            color: #888;
+        }
+
         .logout-btn {
             background: #8B6914;
             color: white;
@@ -120,11 +160,7 @@
             box-shadow: 0 6px 20px rgba(139, 105, 20, 0.4);
         }
 
-        .logout-btn i {
-            font-size: 16px;
-        }
-
-        /* Form styling with brown-gold-orange accent */
+        /* Form styling */
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -179,15 +215,6 @@
         .form-group select:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-        }
-
-        .form-group select option {
-            padding: 8px;
-        }
-
-        .form-group select optgroup {
-            font-weight: 700;
-            color: #5a3e1b;
         }
 
         .btn-container {
@@ -250,12 +277,6 @@
             box-shadow: 0 8px 28px rgba(192, 57, 43, 0.4);
         }
 
-        .btn-success:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
         .url-preview {
             margin-top: 30px;
             padding: 20px 24px;
@@ -311,7 +332,35 @@
             font-weight: 600;
         }
 
-        /* Full width for single column on smaller screens */
+        /* Welcome banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #fdf6ee, #f5ebe0);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 25px;
+            border: 2px solid #e8d5b5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .welcome-banner .greeting {
+            font-size: 18px;
+            color: #5a3e1b;
+            font-weight: 700;
+        }
+
+        .welcome-banner .greeting span {
+            color: #8B6914;
+        }
+
+        .welcome-banner .login-time {
+            font-size: 13px;
+            color: #888;
+        }
+
         @media (max-width: 992px) {
             .container {
                 max-width: 90%;
@@ -351,6 +400,11 @@
                 font-size: 24px;
             }
 
+            .user-info-badge {
+                width: 100%;
+                justify-content: center;
+            }
+
             .logout-btn {
                 width: 100%;
                 justify-content: center;
@@ -363,6 +417,11 @@
             .btn {
                 padding: 14px 20px;
                 font-size: 15px;
+            }
+
+            .welcome-banner {
+                flex-direction: column;
+                text-align: center;
             }
         }
 
@@ -384,6 +443,10 @@
                 padding: 12px 14px;
                 font-size: 14px;
             }
+
+            .user-info-badge .user-name {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -393,16 +456,32 @@
         <!-- Header with Logo -->
         <div class="header">
             <div class="header-left">
-                <img src="img/logo.png" alt="WISDOM FOUNADATION SCHOOLS EGBEWA ADO EKITI Logo" class="header-logo">
+                <img src="img/logo.png" alt="WISDOM FOUNDATION SCHOOLS EGBEWA ADO EKITI Logo" class="header-logo">
                 <div class="header-text">
                     <h1>📋 Sheet Board</h1>
-                    <div class="subtitle">WISDOM FOUNADATION SCHOOLS EGBEWA ADO EKITI</div>
-                    <div class="motto">🙏GATEWAY TO THE UNIVERSITY </div>
+                    <div class="subtitle">WISDOM FOUNDATION SCHOOLS EGBEWA ADO EKITI</div>
+                    <div class="motto">🙏 GATEWAY TO THE UNIVERSITY</div>
                 </div>
             </div>
-            <button class="logout-btn" onclick="logout()">
-                <i>🚪</i> Logout
-            </button>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <!-- User Info Badge -->
+                <div class="user-info-badge" id="userInfoBadge">
+                    <div class="avatar" id="userAvatar">👤</div>
+                    <div class="user-details">
+                        <span class="user-name" id="userDisplayName">Loading...</span>
+                        <span class="user-email" id="userDisplayEmail">Loading...</span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i>🚪</i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <div class="greeting">👋 Welcome, <span id="welcomeUserName">User</span>!</div>
+            <div class="login-time" id="loginTimeDisplay">Logged in just now</div>
         </div>
 
         <form id="sheetForm">
@@ -477,7 +556,101 @@
 
     <script>
         // ============================================================
-        // STUDENT DATA (as provided)
+        // FIREBASE CONFIG (for user data)
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMS9yCW7gGln1X4rMq33RHoYeFWBLM0-E",
+            authDomain: "broadsheet-492aa.firebaseapp.com",
+            projectId: "broadsheet-492aa",
+            storageBucket: "broadsheet-492aa.firebasestorage.app",
+            messagingSenderId: "631605688845",
+            appId: "1:631605688845:web:5ebfa528d7596f21033344",
+            measurementId: "G-5DSG36J39H"
+        };
+
+        // Import Firebase using CDN
+        const script = document.createElement('script');
+        script.src = 'https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js';
+        document.head.appendChild(script);
+
+        script.onload = function() {
+            // Load Firebase Auth and Firestore
+            const authScript = document.createElement('script');
+            authScript.src = 'https://www.gstatic.com/firebasejs/11.0.0/firebase-auth-compat.js';
+            document.head.appendChild(authScript);
+
+            const firestoreScript = document.createElement('script');
+            firestoreScript.src = 'https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore-compat.js';
+            document.head.appendChild(firestoreScript);
+
+            firestoreScript.onload = function() {
+                // Initialize Firebase
+                firebase.initializeApp(firebaseConfig);
+                const auth = firebase.auth();
+                const db = firebase.firestore();
+
+                // ============================================================
+                // CHECK AUTH STATE & LOAD USER DATA
+                // ============================================================
+                auth.onAuthStateChanged(async function(user) {
+                    if (user) {
+                        // User is logged in
+                        console.log('✅ User logged in:', user.email);
+
+                        // Set user email in badge
+                        document.getElementById('userDisplayEmail').textContent = user.email;
+
+                        // Get user data from Firestore
+                        try {
+                            const userDoc = await db.collection('users').doc(user.uid).get();
+                            if (userDoc.exists) {
+                                const userData = userDoc.data();
+                                const displayName = userData.name || userData.displayName || user.email.split('@')[0];
+                                
+                                // Update UI with user name
+                                document.getElementById('userDisplayName').textContent = displayName;
+                                document.getElementById('welcomeUserName').textContent = displayName;
+                                
+                                // Update avatar
+                                const avatar = document.getElementById('userAvatar');
+                                avatar.textContent = displayName.charAt(0).toUpperCase();
+                                
+                                console.log('✅ User data loaded:', userData);
+                            } else {
+                                // No user document, use email as name
+                                const displayName = user.email.split('@')[0];
+                                document.getElementById('userDisplayName').textContent = displayName;
+                                document.getElementById('welcomeUserName').textContent = displayName;
+                                const avatar = document.getElementById('userAvatar');
+                                avatar.textContent = displayName.charAt(0).toUpperCase();
+                            }
+                        } catch (error) {
+                            console.error('❌ Error loading user data:', error);
+                            // Fallback: use email as name
+                            const displayName = user.email.split('@')[0];
+                            document.getElementById('userDisplayName').textContent = displayName;
+                            document.getElementById('welcomeUserName').textContent = displayName;
+                        }
+
+                        // Set login time
+                        const loginTime = localStorage.getItem('wisdom_login_time');
+                        if (loginTime) {
+                            const date = new Date(loginTime);
+                            document.getElementById('loginTimeDisplay').textContent = 
+                                `Logged in at ${date.toLocaleTimeString()}`;
+                        }
+
+                    } else {
+                        // User is NOT logged in - redirect to login
+                        console.log('❌ User not logged in, redirecting...');
+                        window.location.href = 'login_firebase.html';
+                    }
+                });
+            };
+        };
+
+        // ============================================================
+        // STUDENT DATA
         // ============================================================
         const students = [
             // JSS1 (dummy data)
@@ -589,7 +762,6 @@
                 return;
             }
 
-            // Sort students alphabetically by username
             filtered.sort((a, b) => a.username.localeCompare(b.username));
 
             filtered.forEach(student => {
@@ -609,21 +781,17 @@
             const term = termSelect.value;
             const student = studentSelect.value;
 
-            // Validate all fields
             if (!cls || !session || !term || !student) {
                 alert('⚠️ Please select all fields (Class, Session, Term, and Student Name).');
                 return;
             }
 
-            // Build URL: selected_session_selected_class_selected_term_selected_name.html
             const studentSlug = student.replace(/\s+/g, '_');
             const url = `${session}_${cls}_${term}_${studentSlug}_record.html`;
 
-            // Show preview
             urlDisplay.textContent = url;
             urlPreview.classList.add('show');
 
-            // Confirm and redirect
             if (confirm(`📋 Ready to open:\n\n${url}\n\nClick OK to continue.`)) {
                 window.location.href = url;
             }
@@ -642,11 +810,25 @@
         }
 
         // ============================================================
-        // Logout function - redirects to index.html
+        // Logout function - clears session and redirects
         // ============================================================
         function logout() {
             if (confirm('🚪 Are you sure you want to logout?')) {
-                window.location.href = 'index.html';
+                // Clear all session data
+                localStorage.removeItem('wisdom_auth_user');
+                localStorage.removeItem('wisdom_current_student_id');
+                localStorage.removeItem('wisdom_login_time');
+                
+                // Sign out from Firebase
+                if (firebase && firebase.auth) {
+                    firebase.auth().signOut().then(() => {
+                        window.location.href = 'index.html';
+                    }).catch(() => {
+                        window.location.href = 'index.html';
+                    });
+                } else {
+                    window.location.href = 'index.html';
+                }
             }
         }
 
@@ -676,7 +858,6 @@
             });
         });
 
-        // Keyboard shortcut: Enter key to trigger build
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && e.target.tagName === 'SELECT') {
                 e.preventDefault();
@@ -685,10 +866,15 @@
         });
 
         // ============================================================
-        // Initialize: populate student count on load
+        // Initialize
         // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
             populateStudents();
+            
+            // Store login time if not already stored
+            if (!localStorage.getItem('wisdom_login_time')) {
+                localStorage.setItem('wisdom_login_time', new Date().toISOString());
+            }
         });
     </script>
 </body>
