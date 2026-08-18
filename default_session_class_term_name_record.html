@@ -638,7 +638,7 @@
             }
         }
 
-        // ======================== FIXED: COLLECT FROM DOM ========================
+        // ======================== COLLECT FROM DOM ========================
         function collectFromDOM() {
             logDebug('📊 Collecting data from DOM...', 'info');
             
@@ -656,21 +656,16 @@
                 }
             });
 
-            // --- SUBJECTS DATA (FIXED) ---
+            // --- SUBJECTS DATA ---
             const rows = document.querySelectorAll('#scoresBody tr');
             rows.forEach((tr, idx) => {
                 if (currentData.subjects[idx]) {
                     const subj = currentData.subjects[idx];
                     const inputs = tr.querySelectorAll('input');
                     
-                    // Subject name (from the text node in first td)
                     const subjectName = tr.querySelector('td:first-child')?.textContent || '';
                     subj.name = subjectName;
                     
-                    // Map each input to its corresponding field
-                    // Index mapping: 0=subject(not input), 1=test1, 2=test2, 3=test3, 
-                    // 4=ass1, 5=ass2, 6=ass3, 7=casum, 8=exam, 9=total, 
-                    // 10=cummBf, 11=cummScore, 12=avg, 13=pos, 14=grade
                     if (inputs.length >= 15) {
                         subj.test1 = inputs[1]?.value || '0';
                         subj.test2 = inputs[2]?.value || '0';
@@ -722,8 +717,7 @@
             
             logDebug('✅ DOM data collected successfully', 'success', { 
                 student: currentData.student.name,
-                subjects: currentData.subjects.length,
-                remarks: currentData.remarks.length
+                subjects: currentData.subjects.length
             });
         }
 
@@ -772,7 +766,6 @@
                     const inp = document.createElement('input');
                     inp.type = 'text';
                     inp.value = val !== undefined && val !== null ? val : '';
-                    // Make calculated fields readonly (indices 6, 8, 10, 11, 13)
                     if (i === 6 || i === 8 || i === 10 || i === 11 || i === 13) {
                         inp.readOnly = true;
                         inp.style.fontWeight = '600';
@@ -1110,7 +1103,7 @@
             }
         }
 
-        // ==================== LOAD FROM FIRESTORE ====================
+        // ==================== LOAD FROM FIRESTORE (FIXED) ====================
         async function loadFromFirestore(studentId = null) {
             logDebug('📥 Load from Firestore initiated', 'info');
             
@@ -1150,25 +1143,94 @@
                         lastSaved: data.lastSaved
                     });
                     
+                    // Remove metadata fields
                     delete data.ownerId;
                     delete data.ownerEmail;
                     delete data.updatedAt;
                     delete data.lastSaved;
                     delete data.createdAt;
                     delete data.studentId;
+                    delete data.version;
                     
-                    if (typeof window.currentData !== 'undefined') {
-                        window.currentData = data;
+                    // PRESERVE existing data structure and merge with loaded data
+                    // This ensures CCA values don't get reset to "-"
+                    const existingData = window.currentData || JSON.parse(JSON.stringify(DEFAULT_DATA));
+                    
+                    // Merge student data (preserve existing if loaded data is missing)
+                    if (data.student) {
+                        existingData.student = {
+                            ...existingData.student,
+                            ...data.student
+                        };
                     }
-                    localStorage.setItem('wisdom_score_sheet_data', JSON.stringify(data));
-                    localStorage.setItem('wisdom_current_student_id', studentId);
                     
+                    // Merge subjects - PRESERVE existing values if loaded data has "-"
+                    if (data.subjects && Array.isArray(data.subjects)) {
+                        data.subjects.forEach((loadedSubj, idx) => {
+                            if (existingData.subjects[idx]) {
+                                // Only update fields that are not "-" in loaded data
+                                // This prevents CCA values from being reset to "-"
+                                for (let key in loadedSubj) {
+                                    if (loadedSubj[key] !== undefined && loadedSubj[key] !== null && loadedSubj[key] !== '-') {
+                                        existingData.subjects[idx][key] = loadedSubj[key];
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Merge character development
+                    if (data.characterDevelopment) {
+                        data.characterDevelopment.forEach((item, idx) => {
+                            if (existingData.characterDevelopment[idx]) {
+                                existingData.characterDevelopment[idx] = {
+                                    ...existingData.characterDevelopment[idx],
+                                    ...item
+                                };
+                            }
+                        });
+                    }
+                    
+                    // Merge practical skills
+                    if (data.practicalSkills) {
+                        data.practicalSkills.forEach((item, idx) => {
+                            if (existingData.practicalSkills[idx]) {
+                                existingData.practicalSkills[idx] = {
+                                    ...existingData.practicalSkills[idx],
+                                    ...item
+                                };
+                            }
+                        });
+                    }
+                    
+                    // Merge remarks
+                    if (data.remarks) {
+                        data.remarks.forEach((item, idx) => {
+                            if (existingData.remarks[idx]) {
+                                existingData.remarks[idx] = {
+                                    ...existingData.remarks[idx],
+                                    ...item
+                                };
+                            }
+                        });
+                    }
+                    
+                    // Set the merged data
+                    window.currentData = existingData;
+                    currentData = existingData;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('wisdom_score_sheet_data', JSON.stringify(existingData));
+                    localStorage.setItem('wisdom_current_student_id', studentId);
+                    currentStudentId = studentId;
+                    
+                    // Re-render
                     if (typeof window.render === 'function') {
                         window.render();
-                        logDebug('✅ DOM re-rendered with loaded data', 'success');
+                        logDebug('✅ DOM re-rendered with merged data', 'success');
                     }
                     
-                    setStatus(`✅ Data loaded from Firestore for ${data.student.name}!`, 'success');
+                    setStatus(`✅ Data loaded from Firestore for ${data.student?.name || studentId}!`, 'success');
                     if (typeof window.updateCloudStatus === 'function') {
                         window.updateCloudStatus(true);
                     }
