@@ -1,441 +1,695 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="fav_icon2.ico">
-    <title>cbt.wisdomfoundationschools.org</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Sheet Board - WISDOM FOUNADATION SCHOOLS EGBEWA ADO EKITI</title>
     <style>
-        /* {
+        * {
             margin: 0;
             padding: 0;
-             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /*background: url('img/templogo.jpg') no-repeat center center;
-            //content: "";*/
-               
-                            
-        }*/
-           body {
-                position: relative;
-                z-index: 1;
-            }
-            body::before {
-                content: "";
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: url('img/mainlogo.png') no-repeat center center;
-                background-size: 300px 300px; /* adjust as needed*/ 
-                opacity: 0.1; /* watermark transparency */
-                z-index: 0;
-                pointer-events: none;
-                text-align: center 
-                padding: 0;/* allow clicks through*/
-                margin: 0;
-                padding: 0;
-                 background-color: purple;
-                align-items: center;       
-                text-align: center;
-                 box-sizing: border-box;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            }
-       
-       
-        :root {
-            --primary-color: #008000;
-            --secondary-color: #d90000;
-            --background-color: #f5f5f5;
-            --text-color: #333;
-            --card-bg: white;
-            --header-bg: gold;
-            --header-text: white;
-            --nav-bg: #006400;
-            --input-border: #ddd;
+            box-sizing: border-box;
         }
-       
-        .dark-theme {
-            --primary-color: #4CAF50;
-            --secondary-color: #ff5252;
-            --background-color: #2c2c2c;
-            --text-color: #f0f0f0;
-            --card-bg: #3c3c3c;
-            --header-bg: #2e7d32;
-            --header-text: #f0f0f0;
-            --nav-bg: #1b5e20;
-            --input-border: #555;
-        }
-       
+
         body {
-            background-color: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            transition: background-color 0.3s, color 0.3s;
-        }
-       
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fdf6ee 0%, #f5ebe0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
+            position: relative;
         }
-          #student-image {
-            width: 75px;
-            height: 75px;
-            border-radius: 50%;
-            display: block;
-            margin: 0 auto;
+
+        /* Watermark background */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('img/logo.png') no-repeat center center;
+            background-size: 500px 500px;
+            opacity: 0.06;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 50px;
+            max-width: 75%;
+            width: 75%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border-top: 8px solid #8B6914;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header with logo */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 35px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #f0e6d3;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+
+        .header-text h1 {
+            color: #5a3e1b;
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .header-text .subtitle {
+            color: #8B6914;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .header-text .motto {
+            color: #b8860b;
+            font-size: 15px;
+            font-weight: 600;
+            background: #fdf6ee;
+            display: inline-block;
+            padding: 3px 20px;
+            border-radius: 20px;
+            margin-top: 4px;
+            border: 1px solid #e8d5b5;
+        }
+
+        .logout-btn {
+            background: #8B6914;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(139, 105, 20, 0.3);
+        }
+
+        .logout-btn:hover {
+            background: #a87d1a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 105, 20, 0.4);
+        }
+
+        .logout-btn i {
+            font-size: 16px;
+        }
+
+        /* Form styling with brown-gold-orange accent */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
             margin-bottom: 10px;
         }
 
-       
-        /* Navigation Bar */
-        nav {
-            background-color: gold; /*var(--nav-bg);*/
-            padding: 15px 0;
-            margin-bottom: 25px;
-            border-radius: 8px;
+        .form-group {
+            margin-bottom: 22px;
         }
-       
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            color: #5a3e1b;
+            margin-bottom: 8px;
+            font-size: 15px;
         }
-       
-        .nav-links {
-            display: flex;
-            list-style: none;
+
+        .form-group label .required {
+            color: #c0392b;
+            margin-left: 4px;
         }
-       
-        .nav-links li {
-            margin-right: 20px;
-        }
-       
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-       
-        .nav-links a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-       
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 20px;
-            margin-left: 15px;
-        }
-       
-        header {
-            background-color: var(--header-bg);
-            color: var(--header-text);
-            padding: 20px;
-            text-align: center;
-            border-radius: 8px;
-            margin-bottom: 25px;
-        }
-       
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-       
-        .logo {
-            width: 80px;
-            height: 80px;
-            background-color: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-right: 15px;
-            font-weight: bold;
-            color: var(--primary-color);
-            border: 2px solid var(--secondary-color);
-        }
-       
-        h1 {
-            font-size: 28px;
-            margin-bottom: 5px;
-        }
-       
-        .welcome-message {
-            background-color: var(--card-bg);
-            padding: 15px;
-            border-left: 5px solid var(--secondary-color);
-            margin: 20px 0;
-            font-size: 16px;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-       
-        .exam-sections {
-            display: flex;
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-       
-        .exam-section {
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            flex: 1;
-            overflow: hidden;
-        }
-       
-        .section-header {
-            background-color: var(--header-bg);
-            color: var(--header-text);
-            padding: 15px 20px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-       
-        .section-body {
-            padding: 25px;
-        }
-       
-        .instructions {
-            margin-bottom: 20px;
-            /*color: var(--text-color);*/
-             color: red;
-        }
-       
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 20px 0;
-        }
-       
-        input[type="password"] {
+
+        .form-group select {
             width: 100%;
-            max-width: 400px;
-            padding: 12px 15px;
-            border: 1px solid var(--input-border);
-            border-radius: 4px;
-            font-size: 16px;
-            margin-bottom: 15px;
-            text-align: center;
-            background-color: var(--card-bg);
-            color: var(--text-color);
-        }
-       
-        .btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 4px;
+            padding: 14px 18px;
+            border: 2px solid #e8d5b5;
+            border-radius: 12px;
+            font-size: 15px;
+            color: #333;
+            background: white;
+            transition: all 0.3s ease;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background-color 0.3s;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238B6914' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
         }
-       
-        .btn:hover {
-            background-color: var(--nav-bg);
+
+        .form-group select:hover {
+            border-color: #b8860b;
         }
-       
-        .windows-activate {
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #8B6914;
+            box-shadow: 0 0 0 4px rgba(139, 105, 20, 0.12);
+        }
+
+        .form-group select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .form-group select option {
+            padding: 8px;
+        }
+
+        .form-group select optgroup {
+            font-weight: 700;
+            color: #5a3e1b;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
             text-align: center;
-            margin-top: 30px;
-            color: var(--text-color);
-            font-size: 14px;
-            padding: 15px;
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-       
-        @media (max-width: 900px) {
-            .exam-sections {
-                flex-direction: column;
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8B6914, #b8860b);
+            color: white;
+            box-shadow: 0 4px 16px rgba(139, 105, 20, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 28px rgba(139, 105, 20, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f0e6d3;
+            color: #5a3e1b;
+        }
+
+        .btn-secondary:hover {
+            background: #e8d5b5;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: white;
+            box-shadow: 0 4px 16px rgba(192, 57, 43, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 28px rgba(192, 57, 43, 0.4);
+        }
+
+        .btn-success:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .url-preview {
+            margin-top: 30px;
+            padding: 20px 24px;
+            background: #fdf6ee;
+            border-radius: 12px;
+            border: 2px solid #e8d5b5;
+            display: none;
+        }
+
+        .url-preview.show {
+            display: block;
+            animation: fadeSlideIn 0.4s ease;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
             }
-           
-            .nav-container {
-                flex-direction: column;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
-           
-            .nav-links {
-                margin-top: 15px;
-                flex-wrap: wrap;
+        }
+
+        .url-preview label {
+            font-weight: 700;
+            color: #5a3e1b;
+            font-size: 14px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .url-preview .url-display {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            color: #8B6914;
+            word-break: break-all;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #e8d5b5;
+            font-weight: 600;
+        }
+
+        .student-count {
+            text-align: center;
+            font-size: 14px;
+            color: #8B6914;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0e6d3;
+            font-weight: 600;
+        }
+
+        /* Full width for single column on smaller screens */
+        @media (max-width: 992px) {
+            .container {
+                max-width: 90%;
+                width: 90%;
+                padding: 35px 30px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                max-width: 98%;
+                width: 98%;
+                padding: 25px 18px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .header-left {
+                width: 100%;
+            }
+
+            .header-logo {
+                width: 60px;
+                height: 60px;
+            }
+
+            .header-text h1 {
+                font-size: 24px;
+            }
+
+            .logout-btn {
+                width: 100%;
                 justify-content: center;
             }
-           
-            .nav-links li {
-                margin-bottom: 10px;
+
+            .btn-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                padding: 14px 20px;
+                font-size: 15px;
             }
         }
-       
-        @media (max-width: 600px) {
-            .logo-container {
-                flex-direction: column;
-                text-align: center;
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 14px;
             }
-           
-            .logo {
-                margin-right: 0;
-                margin-bottom: 10px;
+
+            .header-logo {
+                width: 50px;
+                height: 50px;
             }
-           
-            input[type="password"] {
-                width: 90%;
+
+            .header-text h1 {
+                font-size: 20px;
+            }
+
+            .form-group select {
+                padding: 12px 14px;
+                font-size: 14px;
             }
         }
     </style>
 </head>
-<body oncontextmenu="return false;">
-    <nav>
-        <div class="nav-container">
-            <ul class="nav-links">
-                <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="#"><i class="fas fa-info-circle"></i> About</a></li>
-                <li><a href="#"><i class="fas fa-question-circle"></i> Help</a></li>
-                <li><a href="#"><i class="fas fa-envelope"></i> Contact</a></li>
-                <li><a href="#"><i class="fas fa-cogs"></i> Services</a></li>
-                <li><a href="Data_Editor.html"><i class="fas fa-cogs"></i> Editor</a></li>
-                <li><a href="index.html"><i class="fas fa-cogs"></i> Sign Out</a></li>
-            </ul>
-            <div>
-                <button class="theme-toggle" id="themeToggle">
-                    <i class="fas fa-moon">☀️</i>
+<body>
+
+    <div class="container">
+        <!-- Header with Logo -->
+        <div class="header">
+            <div class="header-left">
+                <img src="img/logo.png" alt="WISDOM FOUNADATION SCHOOLS EGBEWA ADO EKITI Logo" class="header-logo">
+                <div class="header-text">
+                    <h1>📋 Sheet Board</h1>
+                    <div class="subtitle">WISDOM FOUNADATION SCHOOLS EGBEWA ADO EKITI</div>
+                    <div class="motto">🙏GATEWAY TO THE UNIVERSITY </div>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <i>🚪</i> Logout
+            </button>
+        </div>
+
+        <form id="sheetForm">
+            <!-- Two-column layout for class, session, term -->
+            <div class="form-row">
+                <!-- Class Selection -->
+                <div class="form-group">
+                    <label for="classSelect">Class <span class="required">*</span></label>
+                    <select id="classSelect" required>
+                        <option value="">— Select Class —</option>
+                        <option value="jss1">JSS 1</option>
+                        <option value="jss2">JSS 2</option>
+                        <option value="jss3">JSS 3</option>
+                        <option value="ss1">SS 1</option>
+                        <option value="ss2">SS 2</option>
+                        <option value="ss3">SS 3</option>
+                    </select>
+                </div>
+
+                <!-- Session Selection -->
+                <div class="form-group">
+                    <label for="sessionSelect">Session <span class="required">*</span></label>
+                    <select id="sessionSelect" required>
+                        <option value="">— Select Session —</option>
+                        <option value="2026-2027">2026/2027</option>
+                        <option value="2027-2028">2027/2028</option>
+                        <option value="2028-2029">2028/2029</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <!-- Term Selection -->
+                <div class="form-group">
+                    <label for="termSelect">Term <span class="required">*</span></label>
+                    <select id="termSelect" required>
+                        <option value="">— Select Term —</option>
+                        <option value="first-term">First Term</option>
+                        <option value="second-term">Second Term</option>
+                        <option value="third-term">Third Term</option>
+                    </select>
+                </div>
+
+                <!-- Student Name Selection -->
+                <div class="form-group">
+                    <label for="studentSelect">Student Name <span class="required">*</span></label>
+                    <select id="studentSelect" required>
+                        <option value="">— Select Student —</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="btn-container">
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                    🔄 Reset
+                </button>
+                <button type="button" class="btn btn-success" id="buildBtn" onclick="buildAndRedirect()">
+                    🚀 Build & Go
                 </button>
             </div>
-        </div>
-    </nav>
-   
-    <div class="container">
-        <header>
-            <div class="logo-container">
-                <!--<div class="logo"><img id="student-image" src="img/templogo.jpg" alt="Profile Picture"></div>-->
-                <div><img src="img/mainlogo.png" alt="Profile Picture"></div>
-               
-            </div>
-            <p> WISDOM FOUNDATIONS MODEL SCHOOLS TERMINAL REPORT SHEET PORTAL </p>
-        </header>
-       
-    
+        </form>
 
-             <div class="welcome-message">
-            <div id="student-info">
-            <!--<img id="student-image" src="uploads/<?php echo $image; ?>" alt="Profile Picture">-->
-            <img id="userImage" width="50" height="50" ><br><br>
-        </div >
-            <!--<h2 style="  align-items: center; text-align: center;">Welcome, <?php echo $username; ?>.</h2>-->
-            <h2 style="  align-items: center; text-align: center;" >Welcome, <span id="user"></span></h2>
-  
+        <!-- URL Preview -->
+        <div class="url-preview" id="urlPreview">
+            <label>🔗 Generated URL:</label>
+            <div class="url-display" id="urlDisplay">—</div>
         </div>
 
-             <div class="exam-sections">
-            <div class="exam-section">
-                <div class="section-header">WISDOM FOUNDATIONS COLLEGE JUNIOR SECONDARY</div>
-                <div class="section-body">
-                <p class="instructions"><span style="visibility: hidden; color: red;">----------------------------------------</span>JUNIOR CATEGORY </p>
-                   
-                 <div class="input-group">
-                        
-                       <input type="password" id="input1" placeholder="Junior">
-                        <button onclick="checkInput1()" class="btn">Enter</button>
-                    </div>
-                </div>
-            </div>
-
-              <div class="exam-section">
-                <div class="section-header">WISDOM FOUNDATIONS  COLLEGE SENIOR SECONDARY □</div>
-                <div class="section-body">
-                    <p class="instructions"  color: red;><span style="visibility: hidden;">--------------------------------------</span>SENIOR CATEGORY </p>
-                   
-                    <div class="input-group">
-                           <input type="password" id="input2" placeholder="Senior">
-                            <button onclick="checkInput2()"class="btn">Enter</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-       
-        <div class="windows-activate">
-           <p>&copy; portal.wisdomfoundationschools.org. All rights reserved.</p>
-        </div>
+        <div class="student-count" id="studentCount">Total Students: 0</div>
     </div>
-           
 
+    <script>
+        // ============================================================
+        // STUDENT DATA (as provided)
+        // ============================================================
+        const students = [
+            // JSS1 (dummy data)
+            { username: "John Smith", password: "jss101", image: "jss101.png", paid: true, class: "jss1" },
+            { username: "John Michael", password: "jss102", image: "jss102.png", paid: true, class: "jss1" },
 
+            // JSS2 BOYS (All Paid)
+            { username: "Shehu Ahmeed Marvelous", password: "wfs101", image: "wfs101.png", paid: true, class: "jss2" },
 
+            // JSS2 STUDENTS GIRLS
+            { username: "Fasuan Obaloluwa Adebowale", password: "wfs102", image: "wfs102.png", paid: true, class: "jss2" },
 
+            // JSS3 STUDENTS BOYS
+            { username: "George Emmanuel", password: "wfs201", image: "wfs201.png", paid: true, class: "jss3" },
+            { username: "Adejemilua Peter", password: "wfs202", image: "wfs202.png", paid: true, class: "jss3" },
+            { username: "Oke Ayobami", password: "wfs203", image: "wfs203.png", paid: true, class: "jss3" },
+            { username: "Ibrahim Abdulsalami", password: "wfs204", image: "wfs204.png", paid: true, class: "jss3" },
+            { username: "Chukwuemeka Emmanuel", password: "wfs205", image: "wfs205.png", paid: true, class: "jss3" },
+            { username: "Olorungbohunmi Ayo", password: "wfs206", image: "wfs206.png", paid: true, class: "jss3" },
+            { username: "Dada Tiwalade", password: "wfs207", image: "wfs207.png", paid: true, class: "jss3" },
+            { username: "Nofiu Habibat", password: "wfs208", image: "wfs208.png", paid: true, class: "jss3" },
+            { username: "Fasuan Adetutu", password: "wfs209", image: "wfs209.png", paid: true, class: "jss3" },
+            { username: "Salami Semilore", password: "wfs210", image: "wfs210.jpg", paid: true, class: "jss3" },
+            // JSS3 STUDENTS GIRLS
+            { username: "Shinaola Treasure", password: "wfs211", image: "wfs211.png", paid: true, class: "jss3" },
 
+            // SS1 STUDENTS BOYS
+            { username: "Abdulateef Qudus Ademola", password: "wfs301", image: "wfs301.png", paid: true, class: "ss1" },
+            { username: "Afeez Abdulahi Pelumi", password: "wfs302", image: "wfs302.png", paid: true, class: "ss1" },
+            { username: "Isaac Richard Feranmi", password: "wfs303", image: "wfs303.png", paid: true, class: "ss1" },
+            { username: "Ogunmiloyo Inioluwa David", password: "wfs304", image: "wfs304.png", paid: true, class: "ss1" },
+            { username: "Oladiti David Henry", password: "wfs305", image: "wfs305.png", paid: true, class: "ss1" },
 
-<br>
+            // SS1 STUDENTS GIRLS
+            { username: "Adebayo Khadijat Iyanu", password: "wfs306", image: "wfs306.png", paid: true, class: "ss1" },
+            { username: "Akindele Dunsi Faith", password: "wfs307", image: "wfs307.png", paid: true, class: "ss1" },
+            { username: "Olusola Divine Oluwaseun", password: "wfs308", image: "wfs308.png", paid: true, class: "ss1" },
+            { username: "Onuchie Amarachukwu Esther", password: "wfs309", image: "wfs309.png", paid: true, class: "ss1" },
+            { username: "Umar Fatima Lamine", password: "wfs310", image: "wfs310.png", paid: true, class: "ss1" },
 
-<script>
-document.getElementById('user').innerText = sessionStorage.getItem('username');
-document.getElementById('userImage').src = sessionStorage.getItem('image');
+            // SS2 STUDENTS BOYS
+            { username: "Ajisafe Ezekeil", password: "wfs401", image: "wfs401.png", paid: true, class: "ss2" },
+            { username: "Omolade Darasimi", password: "wfs402", image: "wfs402.png", paid: true, class: "ss2" },
+            { username: "Owolabi Timilehin Testimony", password: "wfs403", image: "wfs403.png", paid: true, class: "ss2" },
+            { username: "Umar Aliyu", password: "wfs404", image: "wfs404.png", paid: true, class: "ss2" },
+            { username: "Dada Faramade", password: "wfs405", image: "wfs405.png", paid: true, class: "ss2" },
+            { username: "Bayode Goodness Opemipo", password: "wfs406", image: "wfs406.png", paid: true, class: "ss2" },
 
-function checkInput1() {
-    if(document.getElementById('input1').value === 'junior') {
-        sessionStorage.setItem('userType', 'junior');
-        window.location.href = 'index_junior.html';
-    } else {
-        alert('Incorrect input for Junior');
-    }
-}
+            // SS2 STUDENTS GIRLS
+            { username: "Oke Inumidun", password: "wfs407", image: "wfs407.png", paid: true, class: "ss2" },
+            { username: "Akindele Mayorkun Rachael", password: "wfs408", image: "wfs408.png", paid: true, class: "ss2" },
+            { username: "Lawal Desmond", password: "wfs409", image: "wfs409.png", paid: true, class: "ss2" },
 
-function checkInput2() {
-    if(document.getElementById('input2').value === 'senior') {
-        sessionStorage.setItem('userType', 'senior');
-        window.location.href = 'index_senior.html';
-    } else {
-        alert('Incorrect input for Senior');
-    }
-}
+            // SS3 STUDENTS BOYS
+            { username: "Aborisadede Timilehin Ayomide", password: "wfs501", image: "wfs501.png", paid: true, class: "ss3" },
+            { username: "Adebisi Mahfouz Adewole", password: "wfs502", image: "wfs502.png", paid: true, class: "ss3" },
+            { username: "Adekunle Samuel Ayomikun", password: "wfs503", image: "wfs503.png", paid: true, class: "ss3" },
+            { username: "Adeyemi Obasanjo Toheeb", password: "wfs504", image: "wfs504.png", paid: true, class: "ss3" },
+            { username: "Ikpengwa Emmanuel", password: "wfs505", image: "wfs505.png", paid: true, class: "ss3" },
+            { username: "Olofintoye Victor Omobarewa", password: "wfs506", image: "wfs506.png", paid: true, class: "ss3" },
+            { username: "Olumide Erioluwa Emmanuel", password: "wfs507", image: "wfs507.png", paid: true, class: "ss3" },
+            { username: "Oluwadare Praise Ayowamide", password: "wfs508", image: "wfs508.png", paid: true, class: "ss3" },
+            { username: "Gabriel Victor Kachisieme", password: "wfs509", image: "wfs509.png", paid: true, class: "ss3" },
 
+            // SS3 STUDENTS GIRLS
+            { username: "Adeola Precious Eniola", password: "wfs510", image: "wfs510.png", paid: true, class: "ss3" },
+            { username: "Afolalu Faith Toluwanimi", password: "wfs511", image: "wfs511.png", paid: true, class: "ss3" },
+            { username: "Olorunmaiye Nifemi Faith", password: "wfs512", image: "wfs512.png", paid: true, class: "ss3" },
+            { username: "Olowoyo Kemisola Glory", password: "wfs513", image: "wfs513.png", paid: true, class: "ss3" },
+            { username: "Ariyo Elizabeth Celestina", password: "wfs514", image: "wfs514.png", paid: true, class: "ss3" }
+        ];
 
-   // Theme toggle functionality
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = themeToggle.querySelector('i');
-       
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-           
-            if (document.body.classList.contains('dark-theme')) {
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            } else {
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
+        // ============================================================
+        // DOM Elements
+        // ============================================================
+        const classSelect = document.getElementById('classSelect');
+        const sessionSelect = document.getElementById('sessionSelect');
+        const termSelect = document.getElementById('termSelect');
+        const studentSelect = document.getElementById('studentSelect');
+        const buildBtn = document.getElementById('buildBtn');
+        const urlPreview = document.getElementById('urlPreview');
+        const urlDisplay = document.getElementById('urlDisplay');
+        const studentCount = document.getElementById('studentCount');
+
+        // ============================================================
+        // Helper: Get students by class
+        // ============================================================
+        function getStudentsByClass(cls) {
+            return students.filter(s => s.class === cls);
+        }
+
+        // ============================================================
+        // Populate student dropdown based on selected class
+        // ============================================================
+        function populateStudents() {
+            const selectedClass = classSelect.value;
+            studentSelect.innerHTML = '<option value="">— Select Student —</option>';
+
+            if (!selectedClass) {
+                studentCount.textContent = 'Total Students: 0';
+                return;
+            }
+
+            const filtered = getStudentsByClass(selectedClass);
+            studentCount.textContent = `Total Students: ${filtered.length}`;
+
+            if (filtered.length === 0) {
+                studentSelect.innerHTML = '<option value="">— No students found —</option>';
+                return;
+            }
+
+            // Sort students alphabetically by username
+            filtered.sort((a, b) => a.username.localeCompare(b.username));
+
+            filtered.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.username;
+                option.textContent = student.username;
+                studentSelect.appendChild(option);
+            });
+        }
+
+        // ============================================================
+        // Build URL and redirect
+        // ============================================================
+        function buildAndRedirect() {
+            const cls = classSelect.value;
+            const session = sessionSelect.value;
+            const term = termSelect.value;
+            const student = studentSelect.value;
+
+            // Validate all fields
+            if (!cls || !session || !term || !student) {
+                alert('⚠️ Please select all fields (Class, Session, Term, and Student Name).');
+                return;
+            }
+
+            // Build URL: selected_session_selected_class_selected_term_selected_name.html
+            const studentSlug = student.replace(/\s+/g, '_');
+            const url = `${session}_${cls}_${term}_${studentSlug}_record.html`;
+
+            // Show preview
+            urlDisplay.textContent = url;
+            urlPreview.classList.add('show');
+
+            // Confirm and redirect
+            if (confirm(`📋 Ready to open:\n\n${url}\n\nClick OK to continue.`)) {
+                window.location.href = url;
+            }
+        }
+
+        // ============================================================
+        // Reset form
+        // ============================================================
+        function resetForm() {
+            classSelect.value = '';
+            sessionSelect.value = '';
+            termSelect.value = '';
+            studentSelect.innerHTML = '<option value="">— Select Student —</option>';
+            urlPreview.classList.remove('show');
+            studentCount.textContent = 'Total Students: 0';
+        }
+
+        // ============================================================
+        // Logout function - redirects to index.html
+        // ============================================================
+        function logout() {
+            if (confirm('🚪 Are you sure you want to logout?')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // ============================================================
+        // Event Listeners
+        // ============================================================
+        classSelect.addEventListener('change', function() {
+            populateStudents();
+            urlPreview.classList.remove('show');
+        });
+
+        sessionSelect.addEventListener('change', function() {
+            urlPreview.classList.remove('show');
+        });
+
+        termSelect.addEventListener('change', function() {
+            urlPreview.classList.remove('show');
+        });
+
+        studentSelect.addEventListener('change', function() {
+            urlPreview.classList.remove('show');
+        });
+
+        document.querySelectorAll('select').forEach(sel => {
+            sel.addEventListener('change', function() {
+                urlPreview.classList.remove('show');
+            });
+        });
+
+        // Keyboard shortcut: Enter key to trigger build
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName === 'SELECT') {
+                e.preventDefault();
+                buildAndRedirect();
             }
         });
-       
-        // Simple animation for buttons
-        const buttons = document.querySelectorAll('.btn');
-        buttons.forEach(button => {
-            button.addEventListener('mouseenter', () => {
-                button.style.transform = 'translateY(-2px)';
-                button.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-            });
-           
-            button.addEventListener('mouseleave', () => {
-                button.style.transform = 'translateY(0)';
-                button.style.boxShadow = 'none';
-            });
+
+        // ============================================================
+        // Initialize: populate student count on load
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            populateStudents();
         });
     </script>
-</script>
 </body>
 </html>
