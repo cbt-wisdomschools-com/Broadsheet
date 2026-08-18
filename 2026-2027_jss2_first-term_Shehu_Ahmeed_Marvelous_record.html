@@ -247,6 +247,14 @@
             background: #27ae60;
             border-color: #1e8449;
         }
+        .btn-group .btn-subject-save {
+            background: #8e44ad;
+            border-color: #6c3483;
+            box-shadow: 3px 3px 0 #4a235a;
+            font-size: 0.95rem;
+            padding: 8px 24px;
+        }
+        .btn-group .btn-subject-save:hover { background: #a569bd; }
         .btn-group .btn-json { background: #1e2f3f; border-color: #1a2937; box-shadow: 3px 3px 0 #0f1a24; }
         .btn-group .btn-json:hover { background: #2c4055; }
         .btn-group .btn-debug { 
@@ -447,6 +455,7 @@
 
     <div class="btn-group">
         <button class="btn-cloud-save" id="saveBtn">💾 Save to Cloud</button>
+        <button class="btn-subject-save" id="subjectSaveBtn">📊 Save Subjects Only</button>
         <button class="btn-json" id="exportJsonBtn">📥 Export JSON</button>
         <button class="btn-debug" id="debugToggleBtn">🐛 Toggle Debug</button>
     </div>
@@ -547,6 +556,7 @@
         // ======================== DOM REFS ========================
         const statusMsg = document.getElementById('statusMsg');
         const saveBtn = document.getElementById('saveBtn');
+        const subjectSaveBtn = document.getElementById('subjectSaveBtn');
         const exportJsonBtn = document.getElementById('exportJsonBtn');
         const authStatus = document.getElementById('authStatus');
         const cloudStatus = document.getElementById('cloudStatus');
@@ -628,12 +638,15 @@
                 authStatus.className = 'login-badge logged-in';
                 authStatus.textContent = `🔐 ${user.email}`;
                 saveBtn.disabled = false;
+                subjectSaveBtn.disabled = false;
                 logDebug(`🔐 User authenticated: ${user.email}`, 'success', { uid: user.uid });
             } else {
                 authStatus.className = 'login-badge logged-out';
                 authStatus.textContent = '🔓 Not Logged In';
                 saveBtn.disabled = true;
+                subjectSaveBtn.disabled = true;
                 saveBtn.title = 'Please login to save to cloud';
+                subjectSaveBtn.title = 'Please login to save subjects';
                 logDebug('🔓 User not authenticated', 'warning');
             }
         }
@@ -656,8 +669,10 @@
                 }
             });
 
-            // --- SUBJECTS DATA ---
+            // --- SUBJECTS DATA (FIXED WITH DEBUG LOGGING) ---
             const rows = document.querySelectorAll('#scoresBody tr');
+            logDebug(`📊 Found ${rows.length} subject rows`, 'info');
+            
             rows.forEach((tr, idx) => {
                 if (currentData.subjects[idx]) {
                     const subj = currentData.subjects[idx];
@@ -667,6 +682,9 @@
                     subj.name = subjectName;
                     
                     if (inputs.length >= 15) {
+                        // Log each subject's values before collection
+                        logDebug(`📝 Subject ${idx + 1}: ${subjectName} - Collecting values...`, 'info');
+                        
                         subj.test1 = inputs[1]?.value || '0';
                         subj.test2 = inputs[2]?.value || '0';
                         subj.test3 = inputs[3]?.value || '0';
@@ -681,6 +699,9 @@
                         subj.avg = inputs[12]?.value || '0';
                         subj.pos = inputs[13]?.value || '-';
                         subj.grade = inputs[14]?.value || '-';
+                        
+                        // Log collected values for debugging
+                        logDebug(`📊 ${subjectName}: test1=${subj.test1}, test2=${subj.test2}, test3=${subj.test3}, exam=${subj.exam}`, 'info');
                     }
                 }
             });
@@ -1009,6 +1030,136 @@
             statusMsg.className = 'status-bar ' + type;
         }
 
+        // ==================== SAVE SUBJECTS ONLY (For Debugging) ====================
+        async function saveSubjectsOnly() {
+            logDebug('📊 Save Subjects Only initiated', 'info');
+            
+            if (!currentUser) {
+                logDebug('❌ Save failed: User not logged in', 'error');
+                setStatus('⚠️ Please login to save subjects', 'error');
+                return;
+            }
+
+            if (isSaving) {
+                logDebug('⏳ Save already in progress, skipping', 'warning');
+                return;
+            }
+
+            isSaving = true;
+            const subjectBtn = document.getElementById('subjectSaveBtn');
+            subjectBtn.disabled = true;
+            subjectBtn.textContent = '⏳ Saving Subjects...';
+            setStatus('⏳ Saving subjects to Firestore...', 'saving');
+            logDebug('⏳ Starting subject save operation...', 'info');
+
+            try {
+                logDebug('📊 Collecting subject data from DOM...', 'info');
+                
+                // Collect only subject data
+                const rows = document.querySelectorAll('#scoresBody tr');
+                const subjectsData = [];
+                
+                rows.forEach((tr, idx) => {
+                    const inputs = tr.querySelectorAll('input');
+                    const subjectName = tr.querySelector('td:first-child')?.textContent || '';
+                    
+                    if (inputs.length >= 15) {
+                        const subj = {
+                            name: subjectName,
+                            test1: inputs[1]?.value || '0',
+                            test2: inputs[2]?.value || '0',
+                            test3: inputs[3]?.value || '0',
+                            ass1: inputs[4]?.value || '0',
+                            ass2: inputs[5]?.value || '0',
+                            ass3: inputs[6]?.value || '0',
+                            casum: inputs[7]?.value || '0',
+                            exam: inputs[8]?.value || '0',
+                            total: inputs[9]?.value || '0',
+                            cummBf: inputs[10]?.value || '0',
+                            cummScore: inputs[11]?.value || '0',
+                            avg: inputs[12]?.value || '0',
+                            pos: inputs[13]?.value || '-',
+                            grade: inputs[14]?.value || '-'
+                        };
+                        subjectsData.push(subj);
+                        logDebug(`📝 ${subjectName}: test1=${subj.test1}, test2=${subj.test2}, exam=${subj.exam}`, 'info');
+                    }
+                });
+
+                logDebug(`✅ Collected ${subjectsData.length} subjects`, 'success');
+
+                // Get student name for document ID
+                const studentNameInput = document.querySelector('#bioDataContainer input[data-key="name"]');
+                const studentName = studentNameInput ? studentNameInput.value : currentData.student.name;
+                const studentId = studentName.replace(/\s+/g, '_').toLowerCase();
+
+                // Get existing data from Firestore
+                const docRef = doc(db, 'scoreSheets', studentId);
+                const docSnap = await getDoc(docRef);
+                
+                let existingData = {};
+                if (docSnap.exists()) {
+                    existingData = docSnap.data();
+                    logDebug('📄 Found existing document, will merge subjects', 'info');
+                } else {
+                    logDebug('📄 Creating new document', 'info');
+                }
+
+                // Prepare save data - only update subjects
+                const saveData = {
+                    ...existingData,
+                    subjects: subjectsData,
+                    student: {
+                        ...existingData.student,
+                        name: studentName
+                    },
+                    ownerId: currentUser.uid,
+                    ownerEmail: currentUser.email,
+                    studentId: studentId,
+                    updatedAt: serverTimestamp(),
+                    lastSaved: new Date().toISOString()
+                };
+
+                // Remove metadata that shouldn't be overwritten
+                delete saveData.createdAt;
+
+                logDebug('💾 Writing subjects to Firestore...', 'info');
+                await setDoc(docRef, saveData, { merge: true });
+                
+                logDebug('✅ Subjects saved to Firestore successfully!', 'success');
+                
+                // Update current data
+                if (typeof window.currentData !== 'undefined') {
+                    window.currentData.subjects = subjectsData;
+                }
+                
+                setStatus(`✅ Subjects saved to Firestore for ${studentName}!`, 'success');
+                if (typeof window.updateCloudStatus === 'function') {
+                    window.updateCloudStatus(true);
+                }
+                
+                subjectBtn.className = 'btn-subject-save saved';
+                subjectBtn.textContent = '✅ Subjects Saved';
+                logDebug('🎉 Subject save operation completed successfully!', 'success');
+                
+            } catch (error) {
+                logDebug('❌ Firestore save error', 'error', { 
+                    message: error.message,
+                    code: error.code,
+                    stack: error.stack
+                });
+                setStatus(`❌ Error saving subjects: ${error.message}`, 'error');
+            } finally {
+                isSaving = false;
+                subjectBtn.disabled = false;
+                setTimeout(() => {
+                    subjectBtn.className = 'btn-subject-save';
+                    subjectBtn.textContent = '📊 Save Subjects Only';
+                }, 3000);
+                logDebug('🔓 Subject save operation completed', 'info');
+            }
+        }
+
         // ==================== SAVE TO FIRESTORE ====================
         async function saveToFirestore() {
             logDebug('💾 Save to Firestore initiated', 'info');
@@ -1064,7 +1215,8 @@
                 
                 logDebug('📦 Data prepared for Firestore', 'info', { 
                     fields: Object.keys(saveData),
-                    studentName: saveData.student.name
+                    studentName: saveData.student.name,
+                    subjectCount: saveData.subjects.length
                 });
 
                 logDebug('💾 Writing to Firestore...', 'info');
@@ -1103,7 +1255,7 @@
             }
         }
 
-        // ==================== LOAD FROM FIRESTORE (FIXED) ====================
+        // ==================== LOAD FROM FIRESTORE ====================
         async function loadFromFirestore(studentId = null) {
             logDebug('📥 Load from Firestore initiated', 'info');
             
@@ -1140,7 +1292,8 @@
                     logDebug('📦 Data retrieved from Firestore', 'success', { 
                         student: data.student?.name,
                         owner: data.ownerEmail,
-                        lastSaved: data.lastSaved
+                        lastSaved: data.lastSaved,
+                        subjectCount: data.subjects?.length || 0
                     });
                     
                     // Remove metadata fields
@@ -1153,10 +1306,9 @@
                     delete data.version;
                     
                     // PRESERVE existing data structure and merge with loaded data
-                    // This ensures CCA values don't get reset to "-"
                     const existingData = window.currentData || JSON.parse(JSON.stringify(DEFAULT_DATA));
                     
-                    // Merge student data (preserve existing if loaded data is missing)
+                    // Merge student data
                     if (data.student) {
                         existingData.student = {
                             ...existingData.student,
@@ -1168,8 +1320,6 @@
                     if (data.subjects && Array.isArray(data.subjects)) {
                         data.subjects.forEach((loadedSubj, idx) => {
                             if (existingData.subjects[idx]) {
-                                // Only update fields that are not "-" in loaded data
-                                // This prevents CCA values from being reset to "-"
                                 for (let key in loadedSubj) {
                                     if (loadedSubj[key] !== undefined && loadedSubj[key] !== null && loadedSubj[key] !== '-') {
                                         existingData.subjects[idx][key] = loadedSubj[key];
@@ -1284,19 +1434,27 @@
             }
         });
 
-        // ==================== SAVE BUTTON ====================
+        // ==================== SAVE BUTTONS ====================
         const saveBtn = document.getElementById('saveBtn');
         saveBtn.addEventListener('click', () => {
             logDebug('🖱️ Save button clicked', 'info');
             saveToFirestore();
         });
 
+        const subjectBtn = document.getElementById('subjectSaveBtn');
+        subjectBtn.addEventListener('click', () => {
+            logDebug('🖱️ Save Subjects Only button clicked', 'info');
+            saveSubjectsOnly();
+        });
+
         // ==================== EXPOSE FUNCTIONS ====================
         window.saveToFirestore = saveToFirestore;
         window.loadFromFirestore = loadFromFirestore;
+        window.saveSubjectsOnly = saveSubjectsOnly;
 
         logDebug('✅ Firestore integration loaded successfully!', 'success');
-        logDebug('💡 Click "Save to Cloud" to sync to Firestore', 'info');
+        logDebug('💡 Click "Save to Cloud" to sync all data', 'info');
+        logDebug('📊 Click "Save Subjects Only" to test subject saving', 'info');
         logDebug('🔄 Auto-load enabled when logged in', 'info');
         logDebug('🐛 Open debug log to see detailed operations', 'info');
     </script>
