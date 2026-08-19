@@ -326,9 +326,9 @@
         </div>
 
         <!-- ===== DEBUG ===== -->
-        <!--<div class="debug-container">
-            <button class="debug-toggle" id="debugToggle">🔍 Show Debug Log</button>
-            <div class="debug-log" id="debugLog"></div>-->
+        <div class="debug-container">
+            <button class="debug-toggle" id="debugToggle">🔍 Log</button>
+            <div class="debug-log" id="debugLog"></div>
         </div>
     </div>
 
@@ -355,10 +355,10 @@
             console.log(`[DEBUG] ${message}`, data || '');
         }
 
-        debugToggle.addEventListener('click', () => {
+        /*debugToggle.addEventListener('click', () => {
             debugLog.classList.toggle('show');
             debugToggle.textContent = debugLog.classList.contains('show') ? '🔒 Hide Debug Log' : '🔍 Show Debug Log';
-        });
+        });*/
 
         // ==================== FIREBASE CONFIG ====================
         const firebaseConfig = {
