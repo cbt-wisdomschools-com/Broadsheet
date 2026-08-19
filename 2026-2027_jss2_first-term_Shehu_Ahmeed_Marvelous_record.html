@@ -405,8 +405,8 @@
     <div class="logo">
         <img src="img/logo.png" alt="School Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27200%27 height=%2760%27 viewBox=%270 0 200 60%27%3E%3Crect width=%27200%27 height=%2760%27 fill=%27%23b87c44%27/%3E%3Ctext x=%2720%27 y=%2740%27 font-family=%27Impact%27 font-size=%2728%27 fill=%27%23fcf3e4%27%3EWISDOM%3C/text%3E%3Ctext x=%27120%27 y=%2740%27 font-family=%27Impact%27 font-size=%2728%27 fill=%27%23f5d6b0%27%3EFOUNDATION%3C/text%3E%3C/svg%3E'">
         <h5>TERMINAL PROGRESS REPORT FOR SECONDARY SCHOOLS</h5>
-        <img id="student-image" src="img/wfs501.png" alt="Profile" style="width:70px; height:70px; border-radius:50%; border:3px solid #b87c44; object-fit:cover;">
-        <h2 id="welcomeName">Student: SHEHU AMHEED MARVELOUS</h2>
+        <img id="student-image" src="img/wfs201.png" alt="Profile" style="width:70px; height:70px; border-radius:50%; border:3px solid #b87c44; object-fit:cover;">
+        <h2 id="welcomeName">Student: SHEHU AHMEED MARVELOUS</h2>
         <h3 id="reportHeader">2026 / 2027 · FIRST TERM REPORT SHEET</h3>
         <div style="margin-top:6px;">
             <span id="authStatus" class="login-badge logged-out">🔓 Not Logged In</span>
@@ -505,6 +505,19 @@
             logDebug('🔍 Debug log ' + (debugVisible ? 'opened' : 'closed'), 'info');
         });
 
+        // ======================== GET STUDENT NAME FROM HTML ========================
+        function getStudentNameFromHTML() {
+            const welcomeNameEl = document.getElementById('welcomeName');
+            if (welcomeNameEl) {
+                const text = welcomeNameEl.textContent;
+                const match = text.match(/Student:\s*(.+)/);
+                if (match) {
+                    return match[1].trim();
+                }
+            }
+            return null;
+        }
+
         // ======================== DEFAULT DATA WITH SUBJECTS ========================
         const DEFAULT_SUBJECTS = [
             { name: "ENGLISH LANGUAGE.", test1: 34, test2: 40, test3: 58, ass1: 10, ass2: 12, ass3: 11, casum: 165, exam: 41, total: 103, cummBf: 70, cummScore: 86, avg: 72, pos: "3rd", grade: "A" },
@@ -522,9 +535,12 @@
             { name: "CCA", test1: "-", test2: "-", test3: "-", ass1: "-", ass2: "-", ass3: "-", casum: "-", exam: "-", total: "-", cummBf: "-", cummScore: "-", avg: "-", pos: "-", grade: "-" }
         ];
 
+        // Get the student name from the HTML
+        const HTML_STUDENT_NAME = getStudentNameFromHTML() || "SHEHU AHMEED MARVELOUS";
+
         const DEFAULT_DATA = {
             student: {
-                name: "SHEHU AMHEED MARVELOUS",
+                name: HTML_STUDENT_NAME,
                 class: "JUNIOR",
                 term: "FIRST",
                 session: "2026/2027",
@@ -532,7 +548,7 @@
                 attendance: 42,
                 outOf: 45,
                 numberInClass: 28,
-                image: "img/wfs101.png"
+                image: "img/wfs102.png"
             },
             subjects: JSON.parse(JSON.stringify(DEFAULT_SUBJECTS)),
             characterDevelopment: [
@@ -578,10 +594,19 @@
             const stored = localStorage.getItem(STORAGE_KEY);
             const savedId = localStorage.getItem(STUDENT_ID_KEY);
             
+            // Start with defaults that use the HTML student name
+            currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+            
             if (stored) {
                 try {
                     const parsed = JSON.parse(stored);
+                    // IMPORTANT: Keep the HTML student name, don't override with localStorage
+                    const htmlName = getStudentNameFromHTML() || HTML_STUDENT_NAME;
+                    
+                    // Merge data but preserve the HTML student name
                     currentData = deepMerge(DEFAULT_DATA, parsed);
+                    currentData.student.name = htmlName; // Force the HTML name
+                    
                     // Ensure subjects exist
                     if (!currentData.subjects || currentData.subjects.length === 0) {
                         logDebug('⚠️ Subjects missing, loading defaults', 'warning');
@@ -593,10 +618,14 @@
                     });
                 } catch(e) { 
                     currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                    // Ensure HTML name is used
+                    currentData.student.name = getStudentNameFromHTML() || HTML_STUDENT_NAME;
                     logDebug('⚠️ Error parsing stored data, using defaults', 'warning', e.message);
                 }
             } else {
+                // Use defaults with HTML name
                 currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                currentData.student.name = getStudentNameFromHTML() || HTML_STUDENT_NAME;
                 logDebug('📄 No stored data found, using defaults', 'info');
             }
             
@@ -609,6 +638,10 @@
 
         function saveData() {
             collectFromDOM();
+            // Always ensure the student name matches the HTML
+            const htmlName = getStudentNameFromHTML() || HTML_STUDENT_NAME;
+            currentData.student.name = htmlName;
+            
             localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
             if (currentStudentId) {
                 localStorage.setItem(STUDENT_ID_KEY, currentStudentId);
@@ -682,6 +715,9 @@
                     const val = inp.value;
                     if (key === 'attendance' || key === 'outOf' || key === 'numberInClass') {
                         currentData.student[key] = parseFloat(val) || 0;
+                    } else if (key === 'name') {
+                        // Keep the HTML name, don't override
+                        // Don't update name from input
                     } else {
                         currentData.student[key] = val;
                     }
@@ -749,6 +785,10 @@
                 }
             });
             
+            // Ensure the student name is always the HTML name
+            const htmlName = getStudentNameFromHTML() || HTML_STUDENT_NAME;
+            currentData.student.name = htmlName;
+            
             logDebug('✅ DOM data collected successfully', 'success', { 
                 student: currentData.student.name,
                 subjects: currentData.subjects ? currentData.subjects.length : 0
@@ -765,13 +805,17 @@
                 currentData.subjects = JSON.parse(JSON.stringify(DEFAULT_SUBJECTS));
             }
             
+            // Ensure the student name matches the HTML
+            const htmlName = getStudentNameFromHTML() || HTML_STUDENT_NAME;
+            currentData.student.name = htmlName;
+            
             const data = currentData;
             const s = data.student;
 
             const bioContainer = document.getElementById('bioDataContainer');
             bioContainer.innerHTML = `
                 <table class="table-small">
-                    <tr><th>Student's Name:</th><td><input type="text" data-key="name" value="${s.name}"></td></tr>
+                    <tr><th>Student's Name:</th><td><input type="text" data-key="name" value="${s.name}" readonly style="font-weight:700; background:#e8dfd2;"></td></tr>
                     <tr><th>Class</th><td><input type="text" data-key="class" value="${s.class}"></td></tr>
                     <tr><th>Term</th><td><input type="text" data-key="term" value="${s.term}"></td></tr>
                     <tr><th>Session</th><td><input type="text" data-key="session" value="${s.session}"></td></tr>
@@ -893,6 +937,9 @@
             if (!currentData.subjects || currentData.subjects.length === 0) {
                 currentData.subjects = JSON.parse(JSON.stringify(DEFAULT_SUBJECTS));
             }
+            // Ensure name is HTML name
+            const htmlName = getStudentNameFromHTML() || HTML_STUDENT_NAME;
+            currentData.student.name = htmlName;
             logDebug('📦 Full data collected for export', 'info');
             return currentData;
         }
@@ -915,7 +962,9 @@
         function resetSubjects() {
             if (confirm('🔄 Reset all subject scores to default values?')) {
                 logDebug('🔄 Resetting subjects to default...', 'info');
+                const htmlName = getStudentNameFromHTML() || HTML_STUDENT_NAME;
                 currentData.subjects = JSON.parse(JSON.stringify(DEFAULT_SUBJECTS));
+                currentData.student.name = htmlName;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
                 render();
                 updateCloudStatus(false);
@@ -960,6 +1009,7 @@
 
         // ======================== INIT ========================
         logDebug('🚀 Application starting...', 'info');
+        logDebug(`📌 Student name from HTML: ${HTML_STUDENT_NAME}`, 'info');
         loadData();
         render();
         updateCloudStatus(false);
@@ -1003,6 +1053,8 @@
         window.logDebug = logDebug;
         window.logout = logout;
         window.DEFAULT_SUBJECTS = DEFAULT_SUBJECTS;
+        window.HTML_STUDENT_NAME = HTML_STUDENT_NAME;
+        window.getStudentNameFromHTML = getStudentNameFromHTML;
     </script>
 
     <!-- ==================== FIRESTORE INTEGRATION ==================== -->
@@ -1097,7 +1149,6 @@
             try {
                 logDebug('📊 Collecting subject data from DOM...', 'info');
                 
-                // Get the tbody directly
                 const tbody = document.getElementById('scoresBody');
                 const rows = tbody ? tbody.querySelectorAll('tr') : [];
                 const subjectsData = [];
@@ -1136,7 +1187,6 @@
 
                 if (subjectsData.length === 0) {
                     logDebug('⚠️ No subjects collected. Using default subjects.', 'warning');
-                    // Use default subjects from the page
                     if (typeof window.DEFAULT_SUBJECTS !== 'undefined') {
                         subjectsData.push(...window.DEFAULT_SUBJECTS);
                         logDebug(`✅ Using ${subjectsData.length} default subjects`, 'info');
@@ -1149,12 +1199,11 @@
                     }
                 }
 
-                // Get student name
-                const studentNameInput = document.querySelector('#bioDataContainer input[data-key="name"]');
-                let studentName = 'SHEHU AMHEED MARVELOUS';
-                if (studentNameInput && studentNameInput.value) {
-                    studentName = studentNameInput.value;
-                }
+                // Get student name from HTML
+                const htmlName = typeof window.getStudentNameFromHTML === 'function' 
+                    ? window.getStudentNameFromHTML() 
+                    : 'SHEHU AHMEED MARVELOUS';
+                const studentName = htmlName || 'SHEHU AHMEED MARVELOUS';
                 const studentId = studentName.replace(/\s+/g, '_').toLowerCase();
 
                 // Get existing data from Firestore
@@ -1169,7 +1218,7 @@
                     logDebug('📄 Creating new document', 'info');
                 }
 
-                // Prepare save data - only update subjects
+                // Prepare save data
                 const saveData = {
                     ...existingData,
                     subjects: subjectsData,
@@ -1191,9 +1240,9 @@
                 
                 logDebug('✅ Subjects saved to Firestore successfully!', 'success');
                 
-                // Update current data
                 if (typeof window.currentData !== 'undefined') {
                     window.currentData.subjects = subjectsData;
+                    window.currentData.student.name = studentName;
                 }
                 
                 setStatus(`✅ ${subjectsData.length} subjects saved to Firestore!`, 'success');
@@ -1328,12 +1377,18 @@
                 return;
             }
 
+            // Get the HTML student name
+            const htmlName = typeof window.getStudentNameFromHTML === 'function' 
+                ? window.getStudentNameFromHTML() 
+                : 'SHEHU AHMEED MARVELOUS';
+            const defaultName = htmlName || 'SHEHU AHMEED MARVELOUS';
+
             if (!studentId) {
                 studentId = localStorage.getItem('wisdom_current_student_id');
                 logDebug(`📌 Using stored student ID: ${studentId || 'none'}`, 'info');
                 
                 if (!studentId) {
-                    const name = prompt('Enter student name to load (e.g., SHEHU AMHEED MARVELOUS):');
+                    const name = prompt('Enter student name to load:');
                     if (!name) {
                         logDebug('❌ Load cancelled: No name provided', 'warning');
                         return;
@@ -1371,9 +1426,11 @@
                     // Get the existing data from the page
                     const existingData = window.currentData || JSON.parse(JSON.stringify(DEFAULT_DATA));
                     
+                    // Force the HTML student name
+                    existingData.student.name = defaultName;
+                    
                     // MERGE SUBJECTS: Only update if Firestore has valid data
                     if (data.subjects && Array.isArray(data.subjects) && data.subjects.length > 0) {
-                        // Check if subjects have actual data
                         const hasData = data.subjects.some(subj => 
                             subj.test1 && subj.test1 !== '0' && subj.test1 !== '-'
                         );
@@ -1394,14 +1451,6 @@
                         }
                     } else {
                         logDebug('📊 No subjects in Firestore, keeping local data', 'info');
-                    }
-                    
-                    // Merge student data
-                    if (data.student && data.student.name) {
-                        existingData.student = {
-                            ...existingData.student,
-                            ...data.student
-                        };
                     }
                     
                     // Merge character development
